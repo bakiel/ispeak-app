@@ -40,8 +40,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/10 flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md bg-white/95 backdrop-blur">
+    <div className="min-h-screen hero-bg-light relative">
+      <div className="relative z-10 flex items-center justify-center px-4 py-12 min-h-screen">
+        <Card className="w-full max-w-md bg-white/95 backdrop-blur shadow-xl">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-4">
             <Image
@@ -194,16 +195,17 @@ export default function LoginPage() {
             </div>
           </div>
         </CardContent>
-      </Card>
-
-      {/* Admin Login Link */}
-      <div className="absolute bottom-4 right-4">
-        <Link
-          href="/admin/login"
-          className="text-sm text-white/70 hover:text-white transition-colors"
-        >
-          Admin Login →
-        </Link>
+        </Card>
+        
+        {/* Admin Login Link */}
+        <div className="mt-4 text-center">
+          <Link
+            href="/admin/login"
+            className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            Admin Login →
+          </Link>
+        </div>
       </div>
     </div>
   )

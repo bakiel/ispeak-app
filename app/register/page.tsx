@@ -72,9 +72,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-white to-accent/10 flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-2xl bg-white/95 backdrop-blur">
-        <CardHeader className="text-center pb-4">
+    <div className="min-h-screen hero-bg-light relative">
+      <div className="relative z-10 flex items-center justify-center px-4 py-12 min-h-screen">
+        <Card className="w-full max-w-2xl bg-white/95 backdrop-blur shadow-xl overflow-hidden">
+          {/* Free Trial Banner */}
+          <div className="bg-accent text-primary px-4 py-3 text-sm font-medium text-center">
+            🎉 Get a FREE 15-minute trial lesson after registration!
+          </div>
+          <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
             <Image
               src="/images/logo/iSpeak Mascot.png"
@@ -587,13 +592,7 @@ export default function RegisterPage() {
             </div>
           </form>
         </CardContent>
-      </Card>
-      
-      {/* Free Trial Banner */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
-        <div className="bg-accent text-primary px-4 py-2 rounded-full text-sm font-medium">
-          🎉 Get a FREE 15-minute trial lesson after registration!
-        </div>
+        </Card>
       </div>
     </div>
   )
