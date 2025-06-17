@@ -1,9 +1,15 @@
 # Deployment Update Instructions
 
-## Changes Made
-- Fixed dark overlay on register page by changing from `hero-bg-secondary` to a light gradient background
-- Fixed dark overlay on login page by changing from `hero-bg-primary` to a light gradient background
-- Both pages now use subtle gradient backgrounds for better visibility of the forms
+## Latest Changes (Update 2)
+- Created new `hero-bg-light` class that keeps the background image but with a subtle white overlay
+- Register page now uses the light hero background with the banner integrated at the top of the card
+- Login page also uses the same light hero background for consistency
+- Fixed the yellow banner positioning - now it's part of the card instead of floating
+- Added proper shadows to cards for better depth
+
+## Previous Changes
+- Fixed dark overlay on register page
+- Fixed dark overlay on login page
 
 ## To Deploy the Update:
 
