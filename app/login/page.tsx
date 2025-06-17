@@ -40,7 +40,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen hero-bg-primary flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/10 flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md bg-white/95 backdrop-blur">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-4">

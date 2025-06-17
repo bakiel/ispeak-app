@@ -72,7 +72,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen hero-bg-secondary flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-white to-accent/10 flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-2xl bg-white/95 backdrop-blur">
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
