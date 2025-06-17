@@ -120,7 +120,7 @@ export default function PricingPage() {
     {
       id: '4',
       title: 'What ages are the lessons designed for?',
-      content: 'Our curriculum is tailored for children ages 3-14, with age-appropriate materials and teaching methods for each group.',
+      content: 'Our curriculum is tailored for children and teens ages 3 and above, with age-appropriate materials and teaching methods for each group.',
     },
     {
       id: '5',

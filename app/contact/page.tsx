@@ -44,7 +44,7 @@ export default function ContactPage() {
       title: 'Book a Consultation',
       description: 'Schedule a free 15-minute call',
       contact: 'Schedule via registration',
-      subtext: 'Discuss your child\'s needs',
+      subtext: 'Discuss your child or teen\'s needs',
       color: 'secondary'
     },
     {
@@ -81,7 +81,7 @@ export default function ContactPage() {
             Get in Touch
           </h1>
           <p className="text-xl max-w-3xl mx-auto text-white">
-            We're here to help you start your child's language learning journey. 
+            We're here to help you start your child or teen's language learning journey. 
             Reach out with questions about our programs, scheduling, or anything else.
           </p>
         </div>
@@ -172,7 +172,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <label htmlFor="childAge" className="block text-sm font-medium text-gray-700 mb-1">
-                        Child's Age
+                        Student's Age
                       </label>
                       <select
                         id="childAge"
@@ -186,6 +186,7 @@ export default function ContactPage() {
                         <option value="6-8">6-8 years</option>
                         <option value="9-11">9-11 years</option>
                         <option value="12-14">12-14 years</option>
+                        <option value="15+">15+ years</option>
                       </select>
                     </div>
                   </div>

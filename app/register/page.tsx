@@ -337,7 +337,7 @@ export default function RegisterPage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                       <option value="">Select age</option>
-                      {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(age => (
+                      {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map(age => (
                         <option key={age} value={age}>{age} years old</option>
                       ))}
                     </select>

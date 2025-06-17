@@ -1,6 +1,14 @@
 # Deployment Update Instructions
 
-## Latest Changes (Update 2)
+## Latest Changes (Update 4 - Age Range Expansion)
+- Updated age range from "3-14" to "3 and above" throughout the application
+- Modified home page hero section to say "AGES 3 AND ABOVE"
+- Updated FAQs to include age groups for teens (15+)
+- Added ages 15, 16, 17, 18 to the register form age selector
+- Updated layout metadata to reflect "children and teens aged 3 and above"
+- Modified marketing copy across all pages to be inclusive of older teens
+
+## Previous Changes (Update 2)
 - Created new `hero-bg-light` class that keeps the background image but with a subtle white overlay
 - Register page now uses the light hero background with the banner integrated at the top of the card
 - Login page also uses the same light hero background for consistency

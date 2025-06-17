@@ -9,12 +9,12 @@ export default function FAQsPage() {
     {
       id: 'general-1',
       title: 'What is iSPEAK?',
-      content: 'iSPEAK is an online African language learning platform designed specifically for children ages 3-14. We offer interactive, culturally-rich lessons in Yoruba, Kiswahili, Twi, and soon Amharic, taught by certified native-speaking educators.',
+      content: 'iSPEAK is an online African language learning platform designed specifically for children and teens ages 3 and above. We offer interactive, culturally-rich lessons in Yoruba, Kiswahili, Twi, and soon Amharic, taught by certified native-speaking educators.',
     },
     {
       id: 'general-2',
       title: 'What age groups does iSPEAK teach?',
-      content: 'iSPEAK offers lessons for children between the ages of 3 and 14. Our curriculum is tailored to different age groups, with age-appropriate activities and learning approaches for very young learners (3-5), young learners (6-10), and pre-teens/teens (11-14).',
+      content: 'iSPEAK offers lessons for children and teens ages 3 and above. Our curriculum is tailored to different age groups, with age-appropriate activities and learning approaches for very young learners (3-5), young learners (6-10), pre-teens (11-14), and teens (15+).',
     },
     {
       id: 'general-3',

@@ -85,7 +85,7 @@ export default function AboutPage() {
               <div>
                 <p className="text-lg text-gray-700 mb-4">
                   iSPEAK Language Learning Program is the first online platform designed specifically 
-                  to connect children ages 3-14 with their African heritage through live, interactive 
+                  to connect children and teens ages 3 and above with their African heritage through live, interactive 
                   language lessons with certified indigenous speakers.
                 </p>
                 <p className="text-lg text-gray-700 mb-4">

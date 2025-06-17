@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: 'iSPEAK - Learn African Languages Online',
     template: '%s | iSPEAK',
   },
-  description: 'Live online language lessons for children aged 3-14. Learn Yoruba, Kiswahili, Twi, and Amharic with indigenous speakers through interactive, culturally immersive classes.',
+  description: 'Live online language lessons for children and teens aged 3 and above. Learn Yoruba, Kiswahili, Twi, and Amharic with indigenous speakers through interactive, culturally immersive classes.',
   keywords: ['African languages', 'online language learning', 'Yoruba', 'Kiswahili', 'Twi', 'Amharic', 'children education', 'cultural education'],
   authors: [{ name: 'iSPEAK Language Learning' }],
   creator: 'iSPEAK',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     url: 'https://ispeaklanguage.org',
     siteName: 'iSPEAK',
     title: 'iSPEAK - Learn African Languages Online',
-    description: 'Live online language lessons for children aged 3-14',
+    description: 'Live online language lessons for children and teens aged 3 and above',
     images: [
       {
         url: '/images/logo/iSpeak Logo.png',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'iSPEAK - Learn African Languages Online',
-    description: 'Live online language lessons for children aged 3-14',
+    description: 'Live online language lessons for children and teens aged 3 and above',
     images: ['/images/logo/iSpeak Logo.png'],
   },
   icons: {
