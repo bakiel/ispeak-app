@@ -22,12 +22,16 @@ export default function Footer() {
                 <span className="text-gray-400">Daisy Ross</span>
               </div>
               <div className="flex items-start">
+                <span className="text-gray-300 font-medium mr-2 w-24 inline-block">Address:</span>
+                <span className="text-gray-400">P.O. Box 4511<br />Macon, Georgia 31213</span>
+              </div>
+              <div className="flex items-start">
                 <span className="text-gray-300 font-medium mr-2 w-24 inline-block">Phone:</span>
                 <span className="text-gray-400">+1 (478) 390-4040</span>
               </div>
               <div className="flex items-start">
                 <span className="text-gray-300 font-medium mr-2 w-24 inline-block">Email:</span>
-                <span className="text-gray-400">info@ispeaklanguages.com</span>
+                <span className="text-gray-400">privacy@ispeaklanguage.org</span>
               </div>
               <div className="flex items-start">
                 <span className="text-gray-300 font-medium mr-2 w-24 inline-block">Hours:</span>

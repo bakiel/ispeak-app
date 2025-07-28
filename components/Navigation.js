@@ -23,7 +23,7 @@ export default function Navigation() {
             </div>
             <div className="flex items-center">
               <i className="fas fa-envelope text-sm mr-2 text-teal-600"></i>
-              <span className="text-sm">info@ispeaklanguages.com</span>
+              <span className="text-sm">privacy@ispeaklanguage.org</span>
             </div>
           </div>
           <div className="flex items-center space-x-3">
@@ -74,10 +74,10 @@ export default function Navigation() {
                 <i className="fas fa-chevron-down ml-1 text-xs"></i>
               </button>
               <div className="absolute top-full left-0 hidden group-hover:block bg-white shadow-lg rounded-md py-2 min-w-[200px]">
-                <Link href="/yoruba" className="block px-4 py-2 hover:bg-gray-100">Yoruba Programs</Link>
-                <Link href="/kiswahili" className="block px-4 py-2 hover:bg-gray-100">Kiswahili Programs</Link>
-                <Link href="/twi" className="block px-4 py-2 hover:bg-gray-100">Twi Programs</Link>
-                <Link href="/amharic" className="block px-4 py-2 hover:bg-gray-100">Amharic Programs (Coming Soon)</Link>
+                <Link href="/plans/yoruba" className="block px-4 py-2 hover:bg-gray-100">Yoruba Programs</Link>
+                <Link href="/plans/kiswahili" className="block px-4 py-2 hover:bg-gray-100">Kiswahili Programs</Link>
+                <Link href="/plans/twi" className="block px-4 py-2 hover:bg-gray-100">Twi Programs</Link>
+                <Link href="/plans" className="block px-4 py-2 hover:bg-gray-100">All Programs</Link>
                 <Link href="/group-rates" className="block px-4 py-2 hover:bg-gray-100">Group Rates</Link>
               </div>
             </div>
@@ -170,10 +170,10 @@ export default function Navigation() {
                 <i className={`fas fa-chevron-${activeDropdown === 'plans' ? 'up' : 'down'} text-sm`}></i>
               </button>
               <div className={`pl-4 py-2 space-y-2 ${activeDropdown === 'plans' ? 'block' : 'hidden'}`}>
-                <Link href="/yoruba" className="block py-1">Yoruba Programs</Link>
-                <Link href="/kiswahili" className="block py-1">Kiswahili Programs</Link>
-                <Link href="/twi" className="block py-1">Twi Programs</Link>
-                <Link href="/amharic" className="block py-1">Amharic Programs (Coming Soon)</Link>
+                <Link href="/plans/yoruba" className="block py-1">Yoruba Programs</Link>
+                <Link href="/plans/kiswahili" className="block py-1">Kiswahili Programs</Link>
+                <Link href="/plans/twi" className="block py-1">Twi Programs</Link>
+                <Link href="/plans" className="block py-1">All Programs</Link>
                 <Link href="/group-rates" className="block py-1">Group Rates</Link>
               </div>
             </div>
