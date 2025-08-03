@@ -27,10 +27,9 @@ export default function Home() {
                 allowFullScreen
                 className="absolute inset-0"
               ></iframe>
-              {/* Badge to cover logo in bottom right */}
-              <div className="absolute bottom-2 right-2 bg-yellow-400 text-gray-900 px-3 py-1 rounded-full shadow-lg flex items-center gap-2 font-bold text-sm">
-                <i className="fas fa-star"></i>
-                <span>NEW VIDEO</span>
+              {/* Badge to cover watermark in bottom right */}
+              <div className="absolute bottom-2 right-2 bg-yellow-400 text-gray-900 px-4 py-2 rounded-full shadow-lg font-bold">
+                <span>Paji</span>
               </div>
             </div>
           </div>
