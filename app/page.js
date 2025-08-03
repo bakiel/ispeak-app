@@ -17,8 +17,8 @@ export default function Home() {
           <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto">
             Paji is the friendly guide who will accompany your child throughout their language learning journey
           </p>
-          <div className="flex justify-center">
-            <div className="relative w-full max-w-xs md:max-w-sm lg:max-w-md aspect-square bg-gray-200 rounded-lg overflow-hidden">
+          <div className="w-full max-w-6xl mx-auto">
+            <div className="relative w-full aspect-video bg-gray-200 rounded-lg overflow-hidden">
               <iframe 
                 width="100%" 
                 height="100%" 
