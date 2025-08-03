@@ -27,6 +27,11 @@ export default function Home() {
                 allowFullScreen
                 className="absolute inset-0"
               ></iframe>
+              {/* Badge to cover logo in bottom right */}
+              <div className="absolute bottom-2 right-2 bg-yellow-400 text-gray-900 px-3 py-1 rounded-full shadow-lg flex items-center gap-2 font-bold text-sm">
+                <i className="fas fa-star"></i>
+                <span>NEW VIDEO</span>
+              </div>
             </div>
           </div>
         </div>
