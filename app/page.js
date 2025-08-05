@@ -4,6 +4,8 @@ import Footer from '@/components/Footer'
 import Link from 'next/link'
 import Image from 'next/image'
 
+// Deployment validation trigger - Build: 2025-08-05
+
 export default function Home() {
   return (
     <>
