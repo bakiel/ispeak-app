@@ -1,12 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Optimize build for Vercel deployment
+  // Use standalone output to bypass build trace collection
+  output: 'standalone',
+  
+  // Disable experimental features that trigger micromatch
   experimental: {
-    // Disable build trace collection that can cause micromatch recursion
-    esmExternals: 'loose',
+    esmExternals: false,
   },
-  // Configure for hybrid deployment (not full static export due to API routes)
-  trailingSlash: true,
+  
   // Image optimization configuration
   images: {
     unoptimized: true,
@@ -17,37 +18,26 @@ const nextConfig = {
       'ik.imagekit.io'
     ]
   },
-  // Webpack configuration to prevent circular dependencies
+  
+  // Webpack configuration to prevent issues
   webpack: (config, { dev, isServer }) => {
-    // Prevent micromatch recursion by limiting file system operations
+    // Disable problematic optimizations
+    config.optimization.usedExports = false;
+    config.optimization.sideEffects = false;
+    
+    // Simple fallbacks
     config.resolve.fallback = {
-      ...config.resolve.fallback,
       fs: false,
       path: false,
       os: false,
-    }
-    
-    // Optimize bundle splitting to prevent large chunks
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      }
+      crypto: false,
     }
     
     return config
   },
-  // Static generation configuration
-  generateBuildId: async () => {
-    // Use a consistent build ID to avoid cache issues
-    return 'ispeak-production-build'
-  }
+  
+  // Simple build ID
+  generateBuildId: () => 'build-' + Date.now()
 }
 
 module.exports = nextConfig
