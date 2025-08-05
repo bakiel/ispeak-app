@@ -6,7 +6,8 @@ const nextConfig = {
       'v3.fal.media',
       'i.ibb.co',
       'imgbb.com',
-      'ik.imagekit.io'
+      'ik.imagekit.io',
+      'gfbedvoexpulmmfitxje.supabase.co'
     ]
   },
 }
