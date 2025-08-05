@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "build:static": "next build",
-    "validate:images": "node scripts/validate-images.js"
+    "validate:images": "node scripts/validate-images.js",
+    "unify:images": "node scripts/unify-product-images.js"
   },
   "engines": {
     "node": ">=18.0.0"
