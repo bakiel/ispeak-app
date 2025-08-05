@@ -1,9 +1,0 @@
-{
-  "name": "scripts",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "iSPEAK database scripts",
-  "scripts": {
-    "populate": "node populateSupabaseProducts.js"
-  }
-}
