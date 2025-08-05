@@ -25,7 +25,8 @@ async function getProducts(filters = {}) {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .or('slug.like.ispeak-%,slug.like.paji-%,slug.like.african-%,slug.like.teacher-%,slug.like.amharic-%,slug.like.yoruba-%,slug.like.kiswahili-%,slug.like.twi-%')
+      .eq('project_name', 'ispeak')
+      .eq('status', 'active')
       .limit(100) // Explicitly request up to 100 products
 
     console.log('Supabase query result:', { data, error })

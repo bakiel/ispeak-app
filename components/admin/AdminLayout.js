@@ -23,6 +23,7 @@ export default function AdminLayout({ children }) {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: 'fas fa-tachometer-alt' },
+    { name: 'Content', href: '/admin/content', icon: 'fas fa-file-alt' },
     { name: 'Blog Posts', href: '/admin/blog', icon: 'fas fa-blog' },
     { 
       name: 'Store', 
