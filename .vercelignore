@@ -1,37 +1,6 @@
-# Exclude everything that's not essential
-node_modules/
-.git/
-.next/
-*.md
+# Minimal ignore file to prevent micromatch recursion
+node_modules
+.git
+.next
 *.log
-*.aux
-*.out
-*.toc
-server.log
 .DS_Store
-tsconfig.tsbuildinfo
-
-# Scripts and docs
-scripts/
-docs/
-reports/
-backup/
-src/
-ispeak-*/
-temp-*/
-lerato-*/
-"ISPEAK*/"
-
-# Keep only essential files
-!app/
-!components/
-!lib/
-!public/
-!package.json
-!package-lock.json
-!next.config.js
-!vercel.json
-!tailwind.config.js
-!postcss.config.js
-!jsconfig.json
-!.env.example
