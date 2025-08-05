@@ -49,6 +49,25 @@ async function getProductRelated(productId, collectionSlug, limit = 4) {
   return getRelatedProducts(productId, collectionSlug, limit)
 }
 
+// Generate static params for all products
+export async function generateStaticParams() {
+  try {
+    // Import products here to avoid build-time issues
+    const { products } = await import('@/lib/productData')
+    
+    // Return all active product slugs
+    return products
+      .filter(product => product.isActive)
+      .map((product) => ({
+        slug: product.slug
+      }))
+  } catch (error) {
+    console.error('Error generating static params for products:', error)
+    // Return empty array if there's an error
+    return []
+  }
+}
+
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
   const product = await getProduct(params.slug)

@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:static": "next build"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.0",
