@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use standalone output to bypass build trace collection
-  output: 'standalone',
+  // Simplified configuration to minimize micromatch triggers
   
   // Disable experimental features that trigger micromatch
   experimental: {
@@ -19,18 +18,12 @@ const nextConfig = {
     ]
   },
   
-  // Webpack configuration to prevent issues
-  webpack: (config, { dev, isServer }) => {
-    // Disable problematic optimizations
-    config.optimization.usedExports = false;
-    config.optimization.sideEffects = false;
-    
-    // Simple fallbacks
+  // Minimal webpack configuration
+  webpack: (config) => {
+    // Simple fallbacks only
     config.resolve.fallback = {
       fs: false,
       path: false,
-      os: false,
-      crypto: false,
     }
     
     return config
