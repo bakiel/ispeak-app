@@ -1,0 +1,69 @@
+
+> ispeak-nextjs@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.0.4
+   - Local:        http://localhost:3000
+   - Environments: .env.local
+
+ ✓ Ready in 806ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.6s (543 modules)
+ ✓ Compiled in 367ms (270 modules)
+ ✓ Compiled /admin in 332ms (543 modules)
+ ✓ Compiled /games in 217ms (549 modules)
+ ✓ Compiled /not-found in 281ms (289 modules)
+ ⨯ Error: Cannot find module '/Users/mac/Downloads/iSPEAK/.next/server/app/not-found_client-reference-manifest.js'
+Require stack:
+- /Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/load-components.js
+- /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/utils.js
+- /Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/dev/hot-middleware.js
+- /Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/dev/hot-reloader-webpack.js
+- /Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/lib/router-server.js
+- /Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/lib/start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1140:15)
+    at /Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/require-hook.js:55:36
+    at Module._load (node:internal/modules/cjs/loader:981:27)
+    at Module.require (node:internal/modules/cjs/loader:1231:19)
+    at mod.require (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:177:18)
+    at loadClientReferenceManifest (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/load-components.js:43:72)
+    at loadComponentsImpl (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/load-components.js:65:29)
+    at async DevServer.findPageComponentsImpl (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/next-server.js:671:36)
+    at async DevServer.findPageComponents (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/dev/next-dev-server.js:562:20)
+    at async DevServer.renderErrorToResponseImpl (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/base-server.js:2009:30)
+    at async DevServer.pipeImpl (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/base-server.js:909:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/next-server.js:266:17)
+    at async DevServer.handleRequestImpl (/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/base-server.js:805:17) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/load-components.js',
+    '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/utils.js',
+    '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/dev/hot-middleware.js',
+    '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/dev/hot-reloader-webpack.js',
+    '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js',
+    '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/lib/router-server.js',
+    '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/lib/start-server.js'
+  ]
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 632ms (711 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/trace'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving 'next/dist/trace/shared' in /Users/mac/Downloads/iSPEAK/node_modules/next/dist/telemetry/events for build dependencies doesn't lead to expected result '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/trace/shared.js', but to 'Error: Can't resolve 'next/dist/trace/shared' in '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/telemetry/events'' instead. Resolving dependencies are ignored for this path.
+<w>  at unknown 4 next/dist/trace/shared
+<w>  at file dependencies /Users/mac/Downloads/iSPEAK/node_modules/next/dist/telemetry/events/swc-load-failure.js
+<w>  at file /Users/mac/Downloads/iSPEAK/node_modules/next/dist/telemetry/events/swc-load-failure.js
+<w>  at file dependencies /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving 'next/dist/server/future/route-kind' in /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/webpack/loaders/next-route-loader for build dependencies doesn't lead to expected result '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/server/future/route-kind.js', but to 'Error: Can't resolve 'next/dist/server/future/route-kind' in '/Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/webpack/loaders/next-route-loader'' instead. Resolving dependencies are ignored for this path.
+<w>  at unknown 4 next/dist/server/future/route-kind
+<w>  at file dependencies /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/mac/Downloads/iSPEAK/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+ ✓ Compiled in 1295ms (398 modules)
+[?25h

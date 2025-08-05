@@ -1,0 +1,127 @@
+import Link from 'next/link'
+import Image from 'next/image'
+import { logoUrls } from '@/lib/logoConfig'
+
+export default function Footer() {
+  return (
+    <footer className="bg-gray-900 text-white pt-10 sm:pt-12 md:pt-16 pb-6">
+      <div className="container mx-auto px-4">
+        {/* Main Footer */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 mb-8 sm:mb-12">
+          {/* Brand Column */}
+          <div className="sm:col-span-2 md:col-span-1 lg:col-span-2">
+            <img 
+              src={logoUrls.textLogoWhite} 
+              alt="iSPEAK Logo" 
+              className="h-10 sm:h-12 md:h-14 lg:h-16 mb-4"
+            />
+            <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">Connecting children to heritage through language</p>
+            
+            <div className="space-y-2 text-sm sm:text-base">
+              <div className="flex items-start">
+                <span className="text-gray-300 font-medium mr-2 w-20 sm:w-24 inline-block">Owner:</span>
+                <span className="text-gray-400">Daisy Ross</span>
+              </div>
+              <div className="flex items-start">
+                <span className="text-gray-300 font-medium mr-2 w-20 sm:w-24 inline-block">Address:</span>
+                <span className="text-gray-400">P.O. Box 4511<br />Macon, Georgia 31213</span>
+              </div>
+              <div className="flex items-start">
+                <span className="text-gray-300 font-medium mr-2 w-20 sm:w-24 inline-block">Phone:</span>
+                <span className="text-gray-400">+1 (478) 390-4040</span>
+              </div>
+              <div className="flex items-start">
+                <span className="text-gray-300 font-medium mr-2 w-20 sm:w-24 inline-block">Email:</span>
+                <span className="text-gray-400 break-all">privacy@ispeaklanguage.org</span>
+              </div>
+              <div className="flex items-start">
+                <span className="text-gray-300 font-medium mr-2 w-20 sm:w-24 inline-block">Hours:</span>
+                <span className="text-gray-400">Monday-Friday, 9am-5pm Eastern Time</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Quick Links */}
+          <div className="mt-6 sm:mt-0">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4">Quick Links</h3>
+            <ul className="space-y-2 text-sm sm:text-base">
+              <li><Link href="/" className="text-gray-400 hover:text-white transition duration-300">Home</Link></li>
+              <li><Link href="/about" className="text-gray-400 hover:text-white transition duration-300">About Us</Link></li>
+              <li><Link href="/plans" className="text-gray-400 hover:text-white transition duration-300">Plans & Pricing</Link></li>
+              <li><Link href="/shop" className="text-gray-400 hover:text-white transition duration-300">Paji Shop</Link></li>
+              <li><Link href="/register" className="text-gray-400 hover:text-white transition duration-300">Free Registration</Link></li>
+              <li><Link href="/login" className="text-gray-400 hover:text-white transition duration-300">Login</Link></li>
+              <li><Link href="/contact" className="text-gray-400 hover:text-white transition duration-300">Contact Us</Link></li>
+            </ul>
+          </div>
+          
+          {/* Resources */}
+          <div className="mt-6 sm:mt-0">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4">Resources</h3>
+            <ul className="space-y-2 text-sm sm:text-base">
+              <li><Link href="/resources/free" className="text-gray-400 hover:text-white transition duration-300">Free Printables</Link></li>
+              <li><Link href="/resources/articles" className="text-gray-400 hover:text-white transition duration-300">Articles</Link></li>
+              <li><Link href="/faq" className="text-gray-400 hover:text-white transition duration-300">FAQs</Link></li>
+              <li><Link href="/educator-apply" className="text-gray-400 hover:text-white transition duration-300">Educator Applications</Link></li>
+              <li><Link href="/loyalty" className="text-gray-400 hover:text-white transition duration-300">Loyalty Program</Link></li>
+              <li><Link href="/admin" className="text-gray-400 hover:text-white transition duration-300">Admin Dashboard</Link></li>
+            </ul>
+          </div>
+          
+          {/* Newsletter */}
+          <div className="sm:col-span-2 md:col-span-1 mt-6 sm:mt-0">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4">Join Our Newsletter</h3>
+            <p className="text-gray-400 mb-4 text-sm sm:text-base">Join our newsletter for language tips and cultural insights</p>
+            <div className="flex flex-col sm:flex-row">
+              <input 
+                type="email" 
+                placeholder="Your email" 
+                className="px-3 py-2 rounded-md sm:rounded-r-none w-full bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-500 mb-2 sm:mb-0"
+              />
+              <button className="bg-teal-500 text-white px-4 py-2 rounded-md sm:rounded-l-none hover:bg-teal-600 transition duration-300">
+                Subscribe
+              </button>
+            </div>
+            
+            <div className="mt-6">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4">Follow Us</h3>
+              <div className="flex space-x-3">
+                <a href="#" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition duration-300">
+                  <i className="fab fa-facebook-f text-white"></i>
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition duration-300">
+                  <i className="fab fa-instagram text-white"></i>
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition duration-300">
+                  <i className="fab fa-youtube text-white"></i>
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition duration-300">
+                  <i className="fab fa-twitter text-white"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Divider */}
+        <div className="border-t border-gray-800 pt-4 sm:pt-6 pb-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0 text-center md:text-left">
+              <p className="text-gray-500 text-xs sm:text-sm">&copy; 2025 iSPEAK Language Learning Program. All Rights Reserved.</p>
+            </div>
+            <div className="flex flex-wrap justify-center md:justify-end footer-links text-xs sm:text-sm">
+              <Link href="/privacy" className="text-gray-500 hover:text-gray-400 mx-1 sm:mx-2 mb-2 md:mb-0">Privacy Policy</Link>
+              <Link href="/terms" className="text-gray-500 hover:text-gray-400 mx-1 sm:mx-2 mb-2 md:mb-0">Terms of Service</Link>
+              <Link href="/child-safety" className="text-gray-500 hover:text-gray-400 mx-1 sm:mx-2 mb-2 md:mb-0">Child Safety Statement</Link>
+              <Link href="/refund" className="text-gray-500 hover:text-gray-400 mx-1 sm:mx-2 mb-2 md:mb-0">Refund Policy</Link>
+              <Link href="/accessibility" className="text-gray-500 hover:text-gray-400 mx-1 sm:mx-2 mb-2 md:mb-0">Accessibility Statement</Link>
+            </div>
+          </div>
+          <div className="text-center text-gray-500 text-xs sm:text-sm mt-4">
+            Proudly created in partnership with NyaEden.
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}

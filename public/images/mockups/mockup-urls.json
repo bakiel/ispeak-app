@@ -1,0 +1,50 @@
+{
+  "tshirt-white-kid": {
+    "url": "https://replicate.delivery/xezq/su4h176uY5YHChEvMhkIJ7SsospaGD6ZPk4DetohvUTwF0jKA/out-0.png",
+    "prompt": "Place this logo on a white children's t-shirt being worn by a smiling 6-year-old African American girl, professional product photography, clean white background, studio lighting",
+    "logoType": "https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/ispeak-logo-with-text.png",
+    "generatedAt": "2025-08-04T15:25:20.817Z"
+  },
+  "tshirt-colors": {
+    "url": "https://replicate.delivery/xezq/8YfyaqsI9PRDYKWeqvSIGtu5cs74YUTFJ5jQXFn9ftrVXQPqA/out-0.png",
+    "prompt": "Folded t-shirts in multiple colors (yellow, turquoise, purple, red) with \"iSPEAK Language Learning Program\" logo and bird mascot printed on them, arranged neatly, professional product photography, clean background",
+    "logoType": "https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/ispeak-logo-with-text.png",
+    "generatedAt": "2025-08-04T15:25:32.185Z"
+  },
+  "hoodie-kid": {
+    "url": "https://replicate.delivery/xezq/QizhobYZeAyrSaBCJpihn8rM1F9o0fnuFVzZucXi7vaAMoHVA/out-0.png",
+    "prompt": "A comfortable hoodie with \"iSPEAK\" logo and colorful bird mascot on front, worn by a happy 8-year-old African American boy reading a book, warm indoor setting, professional photography",
+    "logoType": "https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/ispeak-logo-with-text.png",
+    "generatedAt": "2025-08-04T15:25:54.092Z"
+  },
+  "backpack": {
+    "url": "https://replicate.delivery/xezq/uaHH5q4e7oRfBktjz7e22OdZSHJxWHPGGtCADMfC4XB5wgeoC/out-0.png",
+    "prompt": "Children's school backpack with a cute front-facing bird mascot (Paji) printed large on the front pocket, vibrant colors, professional product shot, clean background",
+    "logoType": "https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/paji-mascot-front.png",
+    "generatedAt": "2025-08-04T15:26:06.555Z"
+  },
+  "notebook-pencils": {
+    "url": "https://replicate.delivery/xezq/WtH0K8qqZKY7PhQmpvmQb90EGB9gU4VhN3KCy6iVQWCGD6RF/out-0.png",
+    "prompt": "Educational notebooks with \"iSPEAK Language Learning Program\" text printed on covers, surrounded by colorful pencils and school supplies, flat lay photography, bright and cheerful",
+    "logoType": "https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/ispeak-text-dark.png",
+    "generatedAt": "2025-08-04T15:26:17.712Z"
+  },
+  "water-bottle": {
+    "url": "https://replicate.delivery/xezq/XV6d59qWOTrAKpeo0HrwjYuR0qawUSdT05YFePM2vaMjMoHVA/out-0.png",
+    "prompt": "Kids water bottle with a cute colorful bird mascot (Paji) design wrapped around it, bright colors, professional product photography",
+    "logoType": "https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/paji-mascot-front.png",
+    "generatedAt": "2025-08-04T15:26:28.482Z"
+  },
+  "stickers": {
+    "url": "https://replicate.delivery/xezq/LLXr4XqIdOJ4BJfwEuppuH5D5B1D9NtSfbxaIQPdd4EhGoHVA/out-0.png",
+    "prompt": "A sticker sheet featuring a cute bird mascot (Paji) in different poses - flying, reading, waving, smiling, die-cut style, colorful, professional print-ready design",
+    "logoType": "https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/paji-mascot-front.png",
+    "generatedAt": "2025-08-04T15:20:02.903Z"
+  },
+  "tote-bag": {
+    "url": "https://replicate.delivery/xezq/EIvlt1hOVpr8HtLzDeV30sbDPJN5gUFGFlHybyf5yCW3GoHVA/out-0.png",
+    "prompt": "Canvas tote bag with \"iSPEAK\" logo and bird mascot printed on side, carried by a parent and child walking together, outdoor setting, lifestyle photography",
+    "logoType": "https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/ispeak-logo-with-text.png",
+    "generatedAt": "2025-08-04T15:20:23.790Z"
+  }
+}
