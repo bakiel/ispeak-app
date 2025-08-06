@@ -77,16 +77,38 @@ export default function AdminDashboard() {
       low_stock_threshold: product.low_stock_threshold || 10,
       status: product.status,
       images: product.images || [],
-      metadata: product.metadata || {}
+      metadata: product.metadata || {},
+      category: product.metadata?.collection?.slug || 'other'
     })
   }
 
   const handleSave = async (productId) => {
+    // Define available categories
+    const categories = {
+      'apparel': { id: 1, name: 'Apparel', slug: 'apparel' },
+      'educational': { id: 2, name: 'Educational Materials', slug: 'educational' },
+      'accessories': { id: 3, name: 'Accessories', slug: 'accessories' },
+      'stationery': { id: 4, name: 'Stationery', slug: 'stationery' },
+      'toys': { id: 5, name: 'Toys & Games', slug: 'toys' },
+      'other': { id: 6, name: 'Other', slug: 'other' }
+    }
+
+    // Update metadata with new category
+    const updatedMetadata = {
+      ...formData.metadata,
+      collection: categories[formData.category] || categories.other,
+      category: categories[formData.category]?.name || 'Other'
+    }
+
     // Auto-update in_stock based on stock_quantity
     const updatedData = {
       ...formData,
-      in_stock: formData.stock_quantity > 0
+      in_stock: formData.stock_quantity > 0,
+      metadata: updatedMetadata
     }
+    
+    // Remove the category field as it's not a database column
+    delete updatedData.category
 
     const { error } = await supabase
       .from('products')
@@ -145,9 +167,20 @@ export default function AdminDashboard() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="mt-2 text-gray-600">Manage your iSPEAK products and inventory</p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="mt-2 text-gray-600">Manage your iSPEAK products and inventory</p>
+          </div>
+          <button
+            onClick={() => window.location.href = '/admin/products/new'}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add New Product
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -316,25 +349,37 @@ export default function AdminDashboard() {
                               />
                             </td>
                             <td className="px-6 py-4">
+                              <label className="text-xs text-gray-500">Category</label>
+                              <select
+                                value={formData.category || 'other'}
+                                onChange={(e) => handleInputChange('category', e.target.value)}
+                                className="w-full border rounded px-2 py-1 mb-2"
+                              >
+                                <option value="apparel">Apparel</option>
+                                <option value="educational">Educational Materials</option>
+                                <option value="accessories">Accessories</option>
+                                <option value="stationery">Stationery</option>
+                                <option value="toys">Toys & Games</option>
+                                <option value="other">Other</option>
+                              </select>
+                              <label className="text-xs text-gray-500">Status</label>
                               <select
                                 value={formData.status}
                                 onChange={(e) => handleInputChange('status', e.target.value)}
-                                className="border rounded px-2 py-1"
+                                className="w-full border rounded px-2 py-1 mb-2"
                               >
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                               </select>
-                              <div className="mt-2">
-                                <label className="flex items-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={formData.featured}
-                                    onChange={(e) => handleInputChange('featured', e.target.checked)}
-                                    className="h-4 w-4 text-purple-600 rounded"
-                                  />
-                                  <span className="ml-2 text-sm">Featured</span>
-                                </label>
-                              </div>
+                              <label className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.featured}
+                                  onChange={(e) => handleInputChange('featured', e.target.checked)}
+                                  className="h-4 w-4 text-purple-600 rounded"
+                                />
+                                <span className="ml-2 text-sm">Featured</span>
+                              </label>
                             </td>
                             <td className="px-6 py-4">
                               <button
