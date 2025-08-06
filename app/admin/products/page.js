@@ -32,11 +32,16 @@ export default function AdminProducts() {
     setFormData({
       name: product.name,
       price: product.price,
+      sale_price: product.sale_price,
       description: product.description,
       featured: product.featured,
       in_stock: product.in_stock,
+      stock_quantity: product.stock_quantity || 0,
+      low_stock_threshold: product.low_stock_threshold || 10,
       status: product.status,
-      images: product.images || []
+      images: product.images || [],
+      sku: product.sku,
+      metadata: product.metadata || {}
     })
   }
 

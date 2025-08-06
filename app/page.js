@@ -45,6 +45,13 @@ export default function Home() {
 
       {/* Value Proposition Cards */}
       <FeatureCards pageSlug="home" />
+      
+      {/* Mission Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="value-card bg-white shadow-lg">
+              <div className="p-6 accent-border-teal h-full flex flex-col">
                 <h3 className="text-xl font-bold mb-3 text-center">Our Mission</h3>
                 <p className="text-gray-600 mb-5 flex-grow">
                   iSPEAK has partnered with several community-based organizations and initiatives to support efforts aligned with our mission of preserving and promoting African languages and cultures. Through these collaborative partnerships, we work together to strengthen indigenous language communities and create meaningful educational opportunities.
@@ -56,8 +63,14 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
             
-            {/* Card 3: Paji Shop */}
+      {/* Paji Shop Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
             <div className="value-card bg-white shadow-lg">
               <div className="p-6 accent-border-blue h-full flex flex-col">
                 <div className="flex justify-center mb-4">
@@ -81,7 +94,14 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
             
+      {/* Plans and Pricing Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
             {/* Card 4: Plans and Pricing */}
             <div className="value-card bg-white shadow-lg">
               <div className="p-6 accent-border-coral h-full flex flex-col">

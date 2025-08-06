@@ -10,7 +10,7 @@ export const metadata = {
   description: 'Shop official iSPEAK merchandise including apparel, school supplies, and accessories featuring Paji mascot. Support African language education with every purchase.',
 }
 
-// Force dynamic rendering to avoid stale data
+// Force dynamic rendering to avoid stale data - Updated 2025-08-06
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
