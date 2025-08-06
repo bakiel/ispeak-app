@@ -48,30 +48,6 @@ export default function ShopFilters({ collections, currentCollection }) {
     <div className="bg-white rounded-lg shadow-md p-6">
       <h3 className="font-bold text-lg mb-4">Filter Products</h3>
       
-      {/* Search */}
-      <div className="mb-6">
-        <h4 className="font-semibold mb-3">Search</h4>
-        <form onSubmit={handleSearch}>
-          <div className="flex">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-accent text-primary rounded-r-md hover:bg-accent/90 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-          </div>
-        </form>
-      </div>
-      
       {/* Categories */}
       <div className="mb-6">
         <h4 className="font-semibold mb-3">Categories</h4>

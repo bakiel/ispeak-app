@@ -36,7 +36,8 @@ async function getProducts(filters = {}) {
       let mappedData = data.map(product => ({
         ...product,
         inventory_quantity: product.stock_quantity || 0, // Map stock_quantity to inventory_quantity
-        in_stock: product.in_stock || (product.stock_quantity > 0)
+        in_stock: product.in_stock || (product.stock_quantity > 0),
+        collection: product.metadata?.collection || null // Extract collection from metadata
       }))
       
       // Filter Supabase data based on parameters
@@ -113,25 +114,16 @@ async function getProducts(filters = {}) {
 }
 
 async function getCollections() {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 50))
+  // Define our collections for iSPEAK products
+  const ispeakCollections = [
+    { id: 1, name: "Apparel", slug: "apparel", display_order: 1 },
+    { id: 2, name: "Educational Materials", slug: "educational", display_order: 2 },
+    { id: 3, name: "Accessories", slug: "accessories", display_order: 3 },
+    { id: 4, name: "Stationery", slug: "stationery", display_order: 4 },
+    { id: 5, name: "Toys & Games", slug: "toys", display_order: 5 }
+  ]
   
-  try {
-    // First try to get from Supabase
-    const { data, error } = await supabase
-      .from('product_collections')
-      .select('*')
-      .order('display_order', { ascending: true })
-
-    if (data && !error) {
-      return data
-    }
-  } catch (error) {
-    console.log('Supabase error, using mock collections:', error.message)
-  }
-
-  // Fallback to mock data
-  return collections
+  return ispeakCollections
 }
 
 export default async function ShopPage({ searchParams }) {
@@ -181,6 +173,28 @@ export default async function ShopPage({ searchParams }) {
         {/* Shop Content */}
         <section className="py-12">
           <div className="container mx-auto px-4">
+            {/* Centered Search Bar */}
+            <div className="max-w-2xl mx-auto mb-12">
+              <form action="/shop" method="GET" className="flex">
+                <input
+                  type="text"
+                  name="search"
+                  defaultValue={filters.search || ''}
+                  placeholder="Search for products..."
+                  className="flex-1 px-4 py-3 text-lg border-2 border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                />
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-accent text-primary text-lg font-medium rounded-r-lg hover:bg-accent/90 transition-colors flex items-center"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  Search
+                </button>
+              </form>
+            </div>
+            
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Filters Sidebar */}
               <aside className="lg:w-64">
