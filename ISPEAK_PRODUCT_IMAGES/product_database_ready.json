@@ -1,0 +1,255 @@
+{
+  "products": [
+    {
+      "name": "African Language Learning Poster Set",
+      "slug": "language-learning-poster-set",
+      "sku": "EDU-POST-001",
+      "price": 39.99,
+      "category": "Educational Materials",
+      "description": "Transform any learning space into an immersive African language classroom with our comprehensive poster set. This collection includes four beautifully designed educational posters featuring the Akan Alphabet, Swahili Numbers (1-8), Common Phrases in multiple languages, and the complete Hausa Alphabet.",
+      "image": "language-posters-REAL.png",
+      "features": ["Set of 4 full-color educational posters", "Covers Akan, Swahili, and Hausa languages", "18\" x 24\" size", "Premium tear-resistant paper", "Wall-ready with pre-punched hanging holes"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "iSPEAK Alphabet Flashcards",
+      "slug": "ispeak-alphabet-flashcards",
+      "sku": "EDU-CARD-001",
+      "price": 24.99,
+      "category": "Educational Materials",
+      "description": "Make learning the alphabet an adventure with our iSPEAK Alphabet Flashcards! This comprehensive set features 52 double-sided cards showcasing letters paired with culturally relevant objects and animals.",
+      "image": "alphabet-flashcards-REAL.png",
+      "features": ["52 premium quality flashcards", "4\" x 6\" size", "Double-sided design", "Storage box included", "QR code for pronunciation audio"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "African Tales with Paji - Storybook",
+      "slug": "african-tales-paji-storybook",
+      "sku": "EDU-BOOK-001",
+      "price": 27.99,
+      "category": "Educational Materials",
+      "description": "Join Paji and friends on magical adventures across Africa! This beautifully illustrated hardcover storybook introduces children to African wildlife, landscapes, and valuable life lessons through engaging narratives.",
+      "image": "african-tales-storybook-REAL.png",
+      "features": ["48-page full-color hardcover", "10 original stories", "8.5\" x 11\" size", "UV coating finish", "Parent/teacher discussion guides"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "Kiswahili Phrases for Kids",
+      "slug": "kiswahili-phrases-kids",
+      "sku": "EDU-BOOK-002",
+      "price": 19.99,
+      "category": "Educational Materials",
+      "description": "Open the door to Kiswahili with this essential phrase book designed specifically for young learners! Features over 100 common phrases with phonetic pronunciations and colorful illustrations.",
+      "image": "kiswahili-phrases-book-REAL.png",
+      "features": ["32 pages of phrases", "Phonetic guides", "Colorful illustrations", "6\" x 9\" size", "Interactive exercises"],
+      "in_stock": true,
+      "featured": false
+    },
+    {
+      "name": "iSPEAK T-Shirt (Adult)",
+      "slug": "ispeak-tshirt-adult",
+      "sku": "APP-TSA-001",
+      "price": 28.99,
+      "category": "Apparel",
+      "description": "Show your support for African language education with our premium iSPEAK adult t-shirt. Made from 100% organic cotton with our signature logo.",
+      "image": "ispeak-tshirt-adult.png",
+      "features": ["100% organic cotton", "Sizes S-3XL", "Unisex modern fit", "5 color options", "Machine washable"],
+      "in_stock": true,
+      "featured": false
+    },
+    {
+      "name": "Paji T-Shirt - Kids",
+      "slug": "paji-tshirt-kids",
+      "sku": "APP-TSK-001",
+      "price": 22.99,
+      "category": "Apparel",
+      "description": "Let your little language learner show off their Paji pride! This colorful kids' t-shirt features our adorable Paji mascot in vibrant colors.",
+      "image": "paji-tshirt-kids.png",
+      "features": ["100% cotton jersey", "Youth sizes XS-XL", "Tear-away label", "CPSIA compliant", "Fade-resistant"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "iSPEAK Kids T-Shirt",
+      "slug": "ispeak-kids-tshirt",
+      "sku": "APP-TSK-002",
+      "price": 21.99,
+      "category": "Apparel",
+      "description": "Inspire young minds with our iSPEAK kids' t-shirt! Designed for comfort during active learning and play.",
+      "image": "ispeak-kids-tshirt.png",
+      "features": ["Cotton-polyester blend", "Youth sizes XS-XL", "Tagless design", "Double-needle hem", "Fun graphics"],
+      "in_stock": true,
+      "featured": false
+    },
+    {
+      "name": "iSPEAK Navy Hoodie",
+      "slug": "ispeak-navy-hoodie",
+      "sku": "APP-HOD-001",
+      "price": 45.99,
+      "category": "Apparel",
+      "description": "Stay warm while representing African language education! Premium navy hoodie with embroidered iSPEAK logo.",
+      "image": "ispeak-hoodie.png",
+      "features": ["80% cotton fleece", "Sizes S-3XL", "Double-lined hood", "Kangaroo pocket", "Embroidered logo"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "iSPEAK Cap",
+      "slug": "ispeak-cap",
+      "sku": "APP-CAP-001",
+      "price": 24.99,
+      "category": "Apparel",
+      "description": "Top off your outfit with our stylish iSPEAK cap! Features high-quality embroidery and comfortable fit.",
+      "image": "ispeak-cap.png",
+      "features": ["100% cotton twill", "6-panel design", "Adjustable strap", "Embroidered logo", "3 color options"],
+      "in_stock": true,
+      "featured": false
+    },
+    {
+      "name": "Teaching African Languages Coffee Mug",
+      "slug": "teacher-coffee-mug",
+      "sku": "ACC-MUG-001",
+      "price": 16.99,
+      "category": "Accessories",
+      "description": "Start every day inspired with our 'Teaching African Languages' coffee mug featuring Paji! Perfect for educators and language enthusiasts.",
+      "image": "teacher-coffee-mug-REAL.png",
+      "features": ["11oz ceramic", "Dishwasher safe", "Microwave safe", "Full-wrap print", "Also in 15oz"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "iSPEAK Canvas Tote Bag",
+      "slug": "ispeak-tote-bag",
+      "sku": "ACC-BAG-001",
+      "price": 22.99,
+      "category": "Accessories",
+      "description": "Carry your language learning materials in style! Durable canvas tote perfect for books, supplies, or daily essentials.",
+      "image": "ispeak-tote-bag.png",
+      "features": ["100% cotton canvas", "15\" x 16\" x 3\"", "Reinforced bottom", "Interior pocket", "Eco-friendly"],
+      "in_stock": true,
+      "featured": false
+    },
+    {
+      "name": "Paji Mascot Backpack",
+      "slug": "paji-mascot-backpack",
+      "sku": "ACC-BAG-002",
+      "price": 39.99,
+      "category": "Accessories",
+      "description": "Make learning an adventure with the Paji Mascot Backpack! Colorful design with plenty of room for books and supplies.",
+      "image": "ispeak-backpack.png",
+      "features": ["Durable polyester", "Padded straps", "Multiple pockets", "16\" x 12\" x 5\"", "Padded back panel"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "Paji Water Bottle",
+      "slug": "paji-water-bottle",
+      "sku": "ACC-BTL-001",
+      "price": 18.99,
+      "category": "Accessories",
+      "description": "Stay hydrated during language learning with our BPA-free Paji water bottle featuring colorful graphics.",
+      "image": "water-bottle.png",
+      "features": ["20oz capacity", "Stainless steel", "Double-wall insulation", "Leak-proof lid", "BPA-free"],
+      "in_stock": true,
+      "featured": false
+    },
+    {
+      "name": "African Heritage Pattern Notebook",
+      "slug": "african-heritage-notebook",
+      "sku": "STA-NTB-001",
+      "price": 14.99,
+      "category": "Stationery",
+      "description": "Capture your language learning journey in our beautiful notebook featuring authentic Kente and Adinkra designs.",
+      "image": "african-patterns-notebook-REAL.png",
+      "features": ["120 pages", "6\" x 8\" size", "Soft-touch cover", "Elastic closure", "Ribbon bookmark"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "Paji Sticker Sheet",
+      "slug": "paji-sticker-sheet",
+      "sku": "STA-STK-001",
+      "price": 8.99,
+      "category": "Stationery",
+      "description": "Brighten any surface with our Paji sticker collection! Features Paji in various fun poses.",
+      "image": "paji-sticker-sheet.jpg",
+      "features": ["15 die-cut stickers", "Waterproof vinyl", "UV resistant", "Removable adhesive", "Various sizes"],
+      "in_stock": true,
+      "featured": false
+    },
+    {
+      "name": "Paji Plush Toy - Soft Cuddly Mascot",
+      "slug": "paji-plush-toy",
+      "sku": "TOY-PLU-001",
+      "price": 29.99,
+      "category": "Toys & Games",
+      "description": "Meet Paji, your child's new best friend! This adorable 12\" plush toy features Paji in signature turquoise, purple, and yellow colors.",
+      "image": "paji-plush-toy-REAL.png",
+      "features": ["12\" height", "Super-soft fabric", "Machine washable", "CE certified", "Adoption certificate"],
+      "in_stock": true,
+      "featured": true
+    },
+    {
+      "name": "Paji Squishy Stress Relief Toy",
+      "slug": "paji-squishy-toy",
+      "sku": "TOY-SQU-001",
+      "price": 12.99,
+      "category": "Toys & Games",
+      "description": "Squeeze away stress while learning! Adorable Paji squishy made from slow-rising, non-toxic foam.",
+      "image": "paji-squishy-toy.png",
+      "features": ["4\" size", "Slow-rising foam", "Non-toxic materials", "Helps with focus", "Ages 3+"],
+      "in_stock": true,
+      "featured": false
+    }
+  ],
+  "categories": [
+    {
+      "name": "Educational Materials",
+      "slug": "educational-materials",
+      "product_count": 4
+    },
+    {
+      "name": "Apparel",
+      "slug": "apparel",
+      "product_count": 5
+    },
+    {
+      "name": "Accessories",
+      "slug": "accessories",
+      "product_count": 4
+    },
+    {
+      "name": "Stationery",
+      "slug": "stationery",
+      "product_count": 2
+    },
+    {
+      "name": "Toys & Games",
+      "slug": "toys-games",
+      "product_count": 2
+    }
+  ],
+  "bundles": [
+    {
+      "name": "Starter Pack",
+      "products": ["ispeak-alphabet-flashcards", "african-heritage-notebook", "paji-sticker-sheet"],
+      "bundle_price": 44.99,
+      "savings": 5.00
+    },
+    {
+      "name": "Teacher Bundle",
+      "products": ["teacher-coffee-mug", "ispeak-tote-bag", "language-learning-poster-set"],
+      "bundle_price": 69.99,
+      "savings": 10.00
+    },
+    {
+      "name": "Complete Paji Set",
+      "products": ["paji-plush-toy", "paji-squishy-toy", "paji-tshirt-kids", "paji-mascot-backpack"],
+      "bundle_price": 99.99,
+      "savings": 15.00
+    }
+  ]
+}

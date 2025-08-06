@@ -77,7 +77,7 @@ ispeak-nextjs/
 
 The app is configured to run on:
 - **Development**: http://localhost:3000
-- **Production**: Configure your deployment platform
+- **Production**: https://ispeak-app-prod.vercel.app
 
 ## 📝 Available Scripts
 
