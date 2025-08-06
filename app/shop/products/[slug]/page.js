@@ -17,7 +17,12 @@ async function getProduct(slug) {
       .single()
 
     if (data && !error) {
-      return data
+      // Map stock_quantity to inventory_quantity for frontend compatibility
+      return {
+        ...data,
+        inventory_quantity: data.stock_quantity || 0,
+        in_stock: data.in_stock || (data.stock_quantity > 0)
+      }
     }
   } catch (error) {
     console.log('Supabase error, using mock data:', error.message)
@@ -39,7 +44,12 @@ async function getProductRelated(productId, collectionSlug, limit = 4) {
       .limit(limit)
 
     if (data && !error && data.length > 0) {
-      return data
+      // Map stock_quantity to inventory_quantity for frontend compatibility
+      return data.map(product => ({
+        ...product,
+        inventory_quantity: product.stock_quantity || 0,
+        in_stock: product.in_stock || (product.stock_quantity > 0)
+      }))
     }
   } catch (error) {
     console.log('Supabase error, using mock data for related products:', error.message)

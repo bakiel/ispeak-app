@@ -32,8 +32,15 @@ async function getProducts(filters = {}) {
     console.log('Supabase query result:', { data, error })
 
     if (data && !error) {
+      // Map Supabase fields to match frontend expectations
+      let mappedData = data.map(product => ({
+        ...product,
+        inventory_quantity: product.stock_quantity || 0, // Map stock_quantity to inventory_quantity
+        in_stock: product.in_stock || (product.stock_quantity > 0)
+      }))
+      
       // Filter Supabase data based on parameters
-      let filteredData = data
+      let filteredData = mappedData
       
       if (collection) {
         filteredData = filteredData.filter(product => product.collection?.slug === collection)
