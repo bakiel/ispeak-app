@@ -44,6 +44,8 @@ export default function CheckoutPage() {
   const [guestCheckout, setGuestCheckout] = useState(true)
   const [clientSecret, setClientSecret] = useState('')
   const [loading, setLoading] = useState(false)
+  const [communityContribution, setCommunityContribution] = useState(false)
+  const communityContributionAmount = 5.00
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -68,12 +70,13 @@ export default function CheckoutPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: Math.round(total * 100), // Convert to cents
+          amount: Math.round((total + (communityContribution ? communityContributionAmount : 0)) * 100), // Convert to cents
           currency: 'usd',
           items: cartItems,
           customerInfo,
           shippingAddress,
-          billingAddress: billingMatchesShipping ? shippingAddress : billingAddress
+          billingAddress: billingMatchesShipping ? shippingAddress : billingAddress,
+          communityContribution: communityContribution ? communityContributionAmount : 0
         }),
       })
 
@@ -150,7 +153,9 @@ export default function CheckoutPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">Checkout</h1>
-                <p className="text-gray-600 mt-1">{itemCount} items • ${total.toFixed(2)}</p>
+                <p className="text-gray-600 mt-1">
+                  {itemCount} items • ${(total + (communityContribution ? communityContributionAmount : 0)).toFixed(2)}
+                </p>
               </div>
               <Link 
                 href="/cart"
@@ -294,7 +299,7 @@ export default function CheckoutPage() {
                         shippingAddress={shippingAddress}
                         billingAddress={billingMatchesShipping ? shippingAddress : billingAddress}
                         onSuccess={handlePaymentSuccess}
-                        total={total}
+                        total={total + (communityContribution ? communityContributionAmount : 0)}
                       />
                     </Elements>
                   )}
@@ -359,6 +364,41 @@ export default function CheckoutPage() {
                     ))}
                   </div>
 
+                  {/* Community Contribution Option */}
+                  <div className="border-t pt-4 mb-4" role="group" aria-labelledby="community-contribution-heading">
+                    <h3 id="community-contribution-heading" className="sr-only">
+                      Community Contribution Option
+                    </h3>
+                    <div className="bg-gradient-to-r from-teal-50 to-yellow-50 rounded-lg p-4 border border-teal-200">
+                      <label className="flex items-start cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={communityContribution}
+                          onChange={(e) => setCommunityContribution(e.target.checked)}
+                          className="mt-1 mr-3 h-4 w-4 text-teal-600 rounded focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                          aria-describedby="contribution-description"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-semibold text-gray-900">
+                              🌍 Support Language Preservation
+                            </span>
+                            <span className="font-bold text-teal-600" aria-label="Five dollars">
+                              $5.00
+                            </span>
+                          </div>
+                          <p id="contribution-description" className="text-sm text-gray-700 mt-1">
+                            Help fund indigenous language councils, provide scholarships for learners, 
+                            and support partner schools across Africa
+                          </p>
+                          <p className="text-xs text-teal-700 mt-2 font-medium">
+                            ✓ 100% goes to education initiatives
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
                   {/* Order Totals */}
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
@@ -373,10 +413,16 @@ export default function CheckoutPage() {
                       <span>Tax</span>
                       <span>${(total * 0.08).toFixed(2)}</span>
                     </div>
+                    {communityContribution && (
+                      <div className="flex justify-between text-sm text-teal-600">
+                        <span>Community Contribution</span>
+                        <span>$5.00</span>
+                      </div>
+                    )}
                     <div className="border-t pt-2">
                       <div className="flex justify-between font-bold">
                         <span>Total</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>${(total + (communityContribution ? communityContributionAmount : 0)).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
