@@ -1,12 +1,14 @@
 'use client'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
+import Link from 'next/link'
 import { useState } from 'react'
 
 export default function DonatePage() {
   const [selectedCategories, setSelectedCategories] = useState([])
   const [donationType, setDonationType] = useState('one-time')
   const [amount, setAmount] = useState(0)
+  const [isAnonymous, setIsAnonymous] = useState(false)
 
   const categories = [
     {
@@ -49,16 +51,78 @@ export default function DonatePage() {
     <>
       <Navigation />
       
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-teal-600 via-teal-500 to-yellow-400 text-white overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
+        
+        <div className="relative container mx-auto px-4 py-16 md:py-24">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Animated Icon */}
+            <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-white/20 backdrop-blur-sm rounded-full mb-6 animate-pulse">
+              <span className="text-4xl md:text-5xl">🌍</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+              Together We Preserve Heritage
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-white/95 max-w-3xl mx-auto">
+              Your generosity fuels our mission to keep African languages alive for future generations
+            </p>
+            
+            {/* Impact Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8 mt-12 max-w-3xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl md:text-4xl font-bold mb-2">500+</div>
+                <div className="text-sm md:text-base text-white/90">Children Learning</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl md:text-4xl font-bold mb-2">12</div>
+                <div className="text-sm md:text-base text-white/90">Partner Schools</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl md:text-4xl font-bold mb-2">4</div>
+                <div className="text-sm md:text-base text-white/90">Languages Preserved</div>
+              </div>
+            </div>
+            
+            {/* Scroll Indicator */}
+            <div className="mt-12 animate-bounce">
+              <i className="fas fa-chevron-down text-2xl text-white/60"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Donation Section */}
       <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">Support Our Mission</h1>
-          <p className="text-lg text-center text-gray-600 mb-8 max-w-3xl mx-auto">
-            Your donation helps us preserve African languages and cultures while supporting communities worldwide.
-          </p>
+
+          {/* Quick Links */}
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 border border-gray-200">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Track Your Impact</h3>
+                  <p className="text-sm text-gray-600">See how donations are making a difference</p>
+                </div>
+                <Link 
+                  href="/donate/progress"
+                  className="w-full sm:w-auto text-center bg-teal-100 text-teal-700 px-6 py-2 rounded-md font-medium hover:bg-teal-200 transition-colors"
+                >
+                  View Progress →
+                </Link>
+              </div>
+            </div>
+          </div>
 
           {/* Donation Categories */}
           <div className="max-w-4xl mx-auto mb-8">
-            <h2 className="text-2xl font-bold mb-4">Select Donation Categories</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-4">Select Donation Categories</h2>
             <p className="text-gray-600 mb-6">Choose one or more categories to support:</p>
             
             <div className="space-y-4">
@@ -93,9 +157,9 @@ export default function DonatePage() {
           <div className="max-w-4xl mx-auto mb-8">
             <h2 className="text-2xl font-bold mb-4">Choose Donation Type</h2>
             
-            <div className="flex gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <button
-                className={`px-6 py-3 rounded-md font-semibold transition-all ${
+                className={`px-4 md:px-6 py-3 rounded-md font-semibold transition-all ${
                   donationType === 'one-time' 
                     ? 'bg-teal-500 text-white' 
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -105,7 +169,7 @@ export default function DonatePage() {
                 One-Time Donation
               </button>
               <button
-                className={`px-6 py-3 rounded-md font-semibold transition-all ${
+                className={`px-4 md:px-6 py-3 rounded-md font-semibold transition-all ${
                   donationType === 'monthly' 
                     ? 'bg-teal-500 text-white' 
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -125,11 +189,11 @@ export default function DonatePage() {
               </h3>
               
               {donationType === 'one-time' ? (
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-4">
                   {[5, 10, 15, 25, 50, 100].map(value => (
                     <button
                       key={value}
-                      className={`py-3 rounded-md font-semibold transition-all ${
+                      className={`py-3 px-2 rounded-md font-semibold transition-all text-sm md:text-base ${
                         amount === value 
                           ? 'bg-teal-500 text-white' 
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -175,10 +239,38 @@ export default function DonatePage() {
 
           {/* Anonymous Option */}
           <div className="max-w-4xl mx-auto mt-6 text-center">
-            <label className="inline-flex items-center">
-              <input type="checkbox" className="mr-2" />
+            <label className="inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                className="mr-2 h-4 w-4 text-teal-600 rounded focus:ring-teal-500" 
+              />
               <span>Make this donation anonymous</span>
             </label>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="max-w-4xl mx-auto mt-12">
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div>
+                  <i className="fas fa-shield-alt text-3xl text-green-600 mb-3"></i>
+                  <h4 className="font-semibold mb-1">Secure Donation</h4>
+                  <p className="text-sm text-gray-600">256-bit SSL encryption</p>
+                </div>
+                <div>
+                  <i className="fas fa-hand-holding-heart text-3xl text-purple-600 mb-3"></i>
+                  <h4 className="font-semibold mb-1">100% Goes to Mission</h4>
+                  <p className="text-sm text-gray-600">Every dollar makes an impact</p>
+                </div>
+                <div>
+                  <i className="fas fa-file-invoice text-3xl text-blue-600 mb-3"></i>
+                  <h4 className="font-semibold mb-1">Tax Deductible</h4>
+                  <p className="text-sm text-gray-600">501(c)(3) nonprofit organization</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

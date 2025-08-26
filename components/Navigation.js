@@ -105,6 +105,9 @@ export default function Navigation() {
             </div>
             
             <Link href="/contact" className="nav-link font-medium">Contact Us</Link>
+            <Link href="/donate" className="nav-link font-medium">
+              <i className="fas fa-heart mr-2 text-red-500"></i>Donate
+            </Link>
             </div>
             
             <div className="hidden lg:flex items-center space-x-3">
@@ -212,6 +215,9 @@ export default function Navigation() {
             </div>
             
             <Link href="/contact" className="block py-2 border-b border-gray-200">Contact Us</Link>
+            <Link href="/donate" className="block py-2 border-b border-gray-200">
+              <i className="fas fa-heart mr-2 text-red-500"></i>Donate
+            </Link>
             
             <div className="pt-4 space-y-3">
               <Link href="/login" className="block py-2 px-4 bg-yellow-300 text-center rounded-md font-medium">Login</Link>
