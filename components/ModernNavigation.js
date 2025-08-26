@@ -96,10 +96,10 @@ export default function ModernNavigation() {
       ]
     },
     {
-      category: 'Support',
+      category: 'Support & Giving',
       items: [
+        { label: '❤️ Donate', href: '/donate', special: true },
         { label: 'Contact Us', href: '/contact' },
-        { label: 'Donate', href: '/donate' },
         { label: 'Loyalty Program', href: '/loyalty' },
       ]
     },
@@ -206,6 +206,17 @@ export default function ModernNavigation() {
 
             {/* Right Section: Actions */}
             <div className="flex items-center space-x-4">
+              {/* Mobile Donate Button */}
+              <div className="lg:hidden">
+                <Link 
+                  href="/donate"
+                  className="flex items-center px-3 py-1.5 text-xs font-bold text-gray-900 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 rounded-full transition-all duration-200 shadow-md"
+                >
+                  <i className="fas fa-heart mr-1 text-xs"></i>
+                  Donate
+                </Link>
+              </div>
+
               {/* Search Icon (Mobile) */}
               <button 
                 className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
@@ -219,6 +230,17 @@ export default function ModernNavigation() {
               {/* Cart */}
               <div className="hidden md:block">
                 <CartIcon />
+              </div>
+
+              {/* Donate Button - Prominent */}
+              <div className="hidden md:block">
+                <Link 
+                  href="/donate"
+                  className="flex items-center px-5 py-2 text-sm font-bold text-gray-900 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 rounded-full transition-all duration-200 transform hover:scale-105 shadow-md"
+                >
+                  <i className="fas fa-heart mr-2"></i>
+                  Donate
+                </Link>
               </div>
 
               {/* User Account */}
@@ -270,7 +292,11 @@ export default function ModernNavigation() {
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-gray-200 rounded-md transition-colors"
+                                className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                                  item.special 
+                                    ? 'text-gray-900 font-bold bg-yellow-50 hover:bg-yellow-100' 
+                                    : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
+                                }`}
                                 onClick={() => setAllMenuOpen(false)}
                               >
                                 {item.label}
