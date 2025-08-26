@@ -1,4 +1,4 @@
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -6,7 +6,7 @@ import Image from 'next/image'
 export default function AboutPage() {
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main>
         {/* Hero Section */}

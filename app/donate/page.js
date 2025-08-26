@@ -1,5 +1,5 @@
 'use client'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -72,7 +72,7 @@ export default function DonatePage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-teal-600 via-teal-500 to-yellow-400 text-white overflow-hidden">
@@ -318,15 +318,8 @@ export default function DonatePage() {
       </section>
 
       {/* Impact Stories Section */}
-      <section className="relative py-16 bg-white overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <img 
-            src="/images/generated/ispeak-method-pillars.jpg"
-            alt="Educational impact"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="relative container mx-auto px-4">
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-8">Your Donation Creates Real Change</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

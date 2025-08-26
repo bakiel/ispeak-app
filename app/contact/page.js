@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 
 export default function ContactPage() {
@@ -44,7 +44,7 @@ export default function ContactPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <div className="min-h-screen bg-gray-50 py-10">
         <div className="container mx-auto px-4 max-w-6xl">

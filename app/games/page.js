@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 
 export default function GamesPage() {
@@ -81,7 +81,7 @@ export default function GamesPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}

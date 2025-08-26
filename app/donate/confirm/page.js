@@ -1,5 +1,5 @@
 'use client'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
@@ -44,8 +44,30 @@ export default function DonationConfirmPage() {
     e.preventDefault()
     setIsProcessing(true)
 
-    // Simulate payment processing
-    setTimeout(() => {
+    try {
+      // Send donation to backend API
+      const response = await fetch('/api/donations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: donationDetails.amount,
+          donationType: donationDetails.donationType,
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          isAnonymous: donationDetails.isAnonymous,
+          categories: donationDetails.categories,
+          paymentMethod: paymentMethod
+        })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to process donation')
+      }
+      
+      const result = await response.json()
+      
       // Clear session storage
       sessionStorage.removeItem('pendingDonation')
       
@@ -54,12 +76,17 @@ export default function DonationConfirmPage() {
         ...donationDetails,
         paymentMethod,
         donorName: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email
+        email: formData.email,
+        confirmationNumber: result.confirmation_number
       }))
       
       // Redirect to thank you page
       router.push('/donate/thank-you')
-    }, 2000)
+    } catch (error) {
+      console.error('Error processing donation:', error)
+      alert('There was an error processing your donation. Please try again.')
+      setIsProcessing(false)
+    }
   }
 
   if (!donationDetails) {
@@ -68,7 +95,7 @@ export default function DonationConfirmPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       {/* Hero Section with African Pattern */}
       <section className="relative bg-gradient-to-br from-teal-600 to-yellow-400 text-white py-8 md:py-12 overflow-hidden">

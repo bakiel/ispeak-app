@@ -89,6 +89,14 @@
     @apply border-b-4 border-coral;
   }
 
+  .accent-border-purple {
+    @apply border-b-4 border-purple-500;
+  }
+
+  .accent-border-pink {
+    @apply border-b-4 border-pink-500;
+  }
+
   .checkered-bg {
     background-color: var(--light-blue);
     background-image: 

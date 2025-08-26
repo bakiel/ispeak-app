@@ -1,4 +1,4 @@
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 
@@ -10,7 +10,7 @@ export const metadata = {
 export default function SpecificationsPage() {
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}

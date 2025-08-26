@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 
@@ -29,7 +29,7 @@ export default function EducatorLoginPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full">

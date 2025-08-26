@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import ProductDetailClient from '@/components/shop/ProductDetailClient'
 import Link from 'next/link'
@@ -112,7 +112,7 @@ export default async function ProductDetailPage({ params }) {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main className="min-h-screen">
         {/* Enhanced Breadcrumb with African pattern */}

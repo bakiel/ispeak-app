@@ -9,12 +9,12 @@ export default async function FeatureCards({ pageSlug = 'home' }) {
     {
       title: 'What is iSPEAK?',
       description: 'iSPEAK is the first language program designed specifically for young learners to connect with indigenous languages through live online lessons. Our unique three-pillar approach develops listening, speaking, and reading skills in a natural, engaging way that keeps children excited about their heritage.',
-      icon_type: 'image',
-      icon_url: 'https://gfbedvoexpulmmfitxje.supabase.co/storage/v1/object/public/logos/paji-mascot-front.png',
+      icon: 'fas fa-graduation-cap',
+      icon_type: 'fontawesome',
       icon_bg_color: 'bg-yellow-300',
       accent_color: 'accent-border-yellow',
       cta_text: 'Learn More',
-      cta_link: '#'
+      cta_link: '/about'
     },
     {
       title: 'Our Mission',
@@ -58,11 +58,13 @@ export default async function FeatureCards({ pageSlug = 'home' }) {
             <div key={card.id || index} className="value-card bg-white shadow-lg">
               <div className={`p-6 ${card.accent_color} h-full flex flex-col`}>
                 <div className="flex justify-center mb-4">
-                  <div className={`w-16 h-16 rounded-full ${card.icon_bg_color} flex items-center justify-center`}>
+                  <div className={`w-16 h-16 rounded-full ${card.icon_bg_color || 'bg-gray-400'} flex items-center justify-center`}>
                     {card.icon_type === 'image' && card.icon_url ? (
                       <img src={card.icon_url} alt={card.title} className="w-12 h-12 object-contain" />
+                    ) : card.icon ? (
+                      <i className={`${card.icon} text-white text-2xl`}></i>
                     ) : (
-                      <i className={`${card.icon} text-white text-3xl`}></i>
+                      <i className="fas fa-star text-white text-2xl"></i>
                     )}
                   </div>
                 </div>
@@ -74,7 +76,17 @@ export default async function FeatureCards({ pageSlug = 'home' }) {
                   <div className="text-center mt-auto">
                     <Link 
                       href={card.cta_link} 
-                      className="inline-block px-4 py-2 bg-yellow-100 text-yellow-800 rounded-md font-medium hover:bg-yellow-200 transition duration-300"
+                      className={`inline-block px-4 py-2 rounded-md font-medium transition duration-300 ${
+                        card.icon_bg_color === 'bg-yellow-300' 
+                          ? 'bg-yellow-400 text-yellow-900 hover:bg-yellow-500'
+                          : card.icon_bg_color === 'bg-teal-500'
+                          ? 'bg-teal-500 text-white hover:bg-teal-600'
+                          : card.icon_bg_color === 'bg-purple-500'
+                          ? 'bg-purple-500 text-white hover:bg-purple-600'
+                          : card.icon_bg_color === 'bg-pink-500'
+                          ? 'bg-pink-500 text-white hover:bg-pink-600'
+                          : 'bg-gray-500 text-white hover:bg-gray-600'
+                      }`}
                     >
                       {card.cta_text}
                     </Link>

@@ -1,10 +1,10 @@
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 
 export default function PhilosophyPage() {
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <div className="min-h-screen bg-white">
         {/* Hero Section */}

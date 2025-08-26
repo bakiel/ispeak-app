@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import { useRouter } from 'next/navigation'
 
@@ -79,7 +79,7 @@ export default function NewProduct() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      <ModernNavigation />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">

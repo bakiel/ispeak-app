@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Section from '@/components/ui/Section'
 import BlogPostContent from '@/components/blog/BlogPostContent'
@@ -97,7 +97,7 @@ export default async function BlogPostPage({ params }) {
     // For other errors, show an error page
     return (
       <>
-        <Navigation />
+        <ModernNavigation />
         <Section variant="white" className="min-h-screen">
         <div className="text-center py-12">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
@@ -168,7 +168,7 @@ export default async function BlogPostPage({ params }) {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       {/* Structured Data */}
       <script
         type="application/ld+json"

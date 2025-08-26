@@ -1,13 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 
 export default function NotFound() {
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main className="min-h-screen flex items-center justify-center bg-gray-50 py-20">
         <div className="text-center px-4">

@@ -1,10 +1,10 @@
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 
 export default function TermsPage() {
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <div className="min-h-screen bg-white py-10">
         <div className="container mx-auto px-4 max-w-4xl">

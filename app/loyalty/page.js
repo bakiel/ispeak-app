@@ -1,4 +1,4 @@
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 
 export default function LoyaltyPage() {
@@ -72,7 +72,7 @@ export default function LoyaltyPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}

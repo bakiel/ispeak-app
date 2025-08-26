@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Section, { SectionTitle, SectionSubtitle } from '@/components/ui/Section'
 import BlogList from '@/components/blog/BlogList'
@@ -106,7 +106,7 @@ async function BlogContent() {
 export default function BlogPage() {
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       <div className="min-h-screen">
         {/* Hero Section */}
       <Section variant="gradient" className="text-center">

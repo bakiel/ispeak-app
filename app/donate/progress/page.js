@@ -1,5 +1,5 @@
 'use client'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
@@ -64,7 +64,7 @@ export default function DonationProgressPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-purple-600 to-teal-600 text-white py-12 md:py-20 overflow-hidden">

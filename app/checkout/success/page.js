@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 
@@ -69,7 +69,7 @@ export default function CheckoutSuccessPage() {
   if (loading) {
     return (
       <>
-        <Navigation />
+        <ModernNavigation />
         <main className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400"></div>
@@ -83,7 +83,7 @@ export default function CheckoutSuccessPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main className="min-h-screen bg-gray-50">
         {/* Success Header */}

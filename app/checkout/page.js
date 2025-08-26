@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import CheckoutForm from '@/components/shop/CheckoutForm'
 import PaymentForm from '@/components/shop/PaymentForm'
@@ -144,7 +144,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main className="min-h-screen bg-gray-50">
         {/* Header */}

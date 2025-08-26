@@ -1,13 +1,16 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import AdminAuthCheck from '@/components/admin/AdminAuthCheck'
 
 export default function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false) // Start closed on mobile
   const [isMobile, setIsMobile] = useState(false)
   const [expandedMenu, setExpandedMenu] = useState('Store') // Expand Store by default
+  const [userEmail, setUserEmail] = useState('')
   const pathname = usePathname()
+  const router = useRouter()
 
   // Check if mobile on mount and window resize
   useEffect(() => {
@@ -18,11 +21,25 @@ export default function AdminLayout({ children }) {
     
     checkMobile()
     window.addEventListener('resize', checkMobile)
+    
+    // Get user info from localStorage
+    const authData = localStorage.getItem('adminAuth')
+    if (authData) {
+      const auth = JSON.parse(authData)
+      setUserEmail(auth.email)
+    }
+    
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+  
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuth')
+    router.push('/admin/login')
+  }
 
   const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: 'fas fa-tachometer-alt' },
+    { name: 'Dashboard', href: '/admin/dashboard', icon: 'fas fa-tachometer-alt' },
+    { name: 'Donations', href: '/admin/donations', icon: 'fas fa-heart' },
     { name: 'Content', href: '/admin/content', icon: 'fas fa-file-alt' },
     { name: 'Blog Posts', href: '/admin/blog', icon: 'fas fa-blog' },
     { 
@@ -52,7 +69,8 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <AdminAuthCheck>
+      <div className="flex h-screen bg-gray-100">
       {/* Mobile overlay */}
       {isMobile && sidebarOpen && (
         <div 
@@ -147,19 +165,19 @@ export default function AdminLayout({ children }) {
               </div>
               {sidebarOpen && (
                 <div className="ml-3">
-                  <p className="text-sm font-semibold">Admin User</p>
-                  <p className="text-xs text-gray-400">admin@ispeak.com</p>
+                  <p className="text-sm font-semibold">Admin</p>
+                  <p className="text-xs text-gray-400">{userEmail || 'admin@ispeak.com'}</p>
                 </div>
               )}
             </div>
             {sidebarOpen && (
-              <Link 
-                href="/logout" 
+              <button 
+                onClick={handleLogout}
                 className="flex items-center px-3 py-2 text-xs bg-red-600 hover:bg-red-700 rounded-md transition-colors"
               >
                 <i className="fas fa-sign-out-alt mr-2"></i>
                 Logout
-              </Link>
+              </button>
             )}
           </div>
         </div>
@@ -205,5 +223,6 @@ export default function AdminLayout({ children }) {
         </main>
       </div>
     </div>
+    </AdminAuthCheck>
   )
 }

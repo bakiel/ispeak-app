@@ -1,4 +1,4 @@
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 
@@ -120,7 +120,7 @@ export default function CulturalInformationPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}

@@ -1,5 +1,5 @@
 'use client'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
@@ -28,7 +28,7 @@ export default function DonationThankYouPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       {/* Hero Section with Celebration */}
       <section className="relative bg-gradient-to-br from-green-500 via-teal-500 to-yellow-400 text-white py-16 md:py-24 overflow-hidden">
@@ -90,7 +90,7 @@ export default function DonationThankYouPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Confirmation Number</p>
-                  <p className="font-mono font-bold text-lg">#{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+                  <p className="font-mono font-bold text-lg">{donationSuccess.confirmationNumber || `#${Math.random().toString(36).substr(2, 9).toUpperCase()}`}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Date</p>

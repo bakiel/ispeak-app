@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/shop/ProductCard'
 import ShopFilters from '@/components/shop/ShopFilters'
@@ -151,7 +151,7 @@ export default async function ShopPage({ searchParams }) {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}

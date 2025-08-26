@@ -1,4 +1,4 @@
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import HeroSection from '@/components/HeroSection'
 import Footer from '@/components/Footer'
 import StatisticsBanner from '@/components/StatisticsBanner'
@@ -11,7 +11,7 @@ import Image from 'next/image'
 export default function Home() {
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       <HeroSection />
       
       {/* Welcome Video Section */}
@@ -83,11 +83,11 @@ export default function Home() {
                   Enhance your child's learning experience with carefully curated cultural materials from the Paji Shop. Browse our collection of children's books, educational toys, and exclusive resources designed to reinforce language learning outside of lessons.
                 </p>
                 <div className="mt-auto">
-                  <p className="text-sm italic text-gray-500 mb-3 text-center">Currently Unavailable</p>
+                  <p className="text-sm font-medium text-gray-600 mb-3 text-center">Coming Soon!</p>
                   <p className="text-sm mb-4 text-center">Sign up to be notified when our shop launches!</p>
-                  <div className="flex flex-col sm:flex-row">
-                    <input type="email" placeholder="Your email" className="px-3 py-2 border border-gray-300 rounded-l-md flex-1 mb-2 sm:mb-0 w-full rounded-md sm:rounded-r-none" />
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded-md sm:rounded-l-none">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input type="email" placeholder="Enter your email" className="px-3 py-2 border border-gray-300 rounded-md flex-1 w-full focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+                    <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors whitespace-nowrap font-medium">
                       Notify Me
                     </button>
                   </div>
@@ -115,7 +115,7 @@ export default function Home() {
                   From single sessions to comprehensive monthly packages, we offer flexible plans to fit every schedule and budget. Choose from $25 single lessons, $75 monthly basics, $90 premium packages, or our $350 three-month immersion experience.
                 </p>
                 <div className="text-center mt-auto">
-                  <a href="#" className="inline-block px-4 py-2 bg-red-100 text-red-800 rounded-md font-medium hover:bg-red-200 transition duration-300">
+                  <a href="/plans" className="inline-block px-4 py-2 bg-red-100 text-red-800 rounded-md font-medium hover:bg-red-200 transition duration-300">
                     View Plans
                   </a>
                 </div>
@@ -143,7 +143,7 @@ export default function Home() {
                 <div className="bg-yellow-50 rounded-lg p-4">
                   <div className="flex items-start">
                     <div className="w-12 h-12 bg-yellow-300 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                      <i className="fas fa-ear-listen text-xl"></i>
+                      <i className="fas fa-headphones text-xl"></i>
                     </div>
                     <div>
                       <h3 className="font-bold text-lg mb-1">Listening Skills</h3>
@@ -311,7 +311,7 @@ export default function Home() {
                 </div>
                 <p className="text-gray-600 mb-4">Ethiopia's official language features a unique script and rich literary tradition.</p>
                 <p className="text-sm text-gray-500 mb-4 italic font-bold">Coming Soon</p>
-                <a href="/waitlist/amharic" className="block text-center bg-purple-500 text-white py-2 rounded-md font-medium hover:bg-purple-600 transition duration-300">
+                <a href="/register?language=amharic&waitlist=true" className="block text-center bg-purple-500 text-white py-2 rounded-md font-medium hover:bg-purple-600 transition duration-300">
                   Join Waitlist
                 </a>
               </div>
@@ -325,7 +325,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto text-center">
             <div className="inline-flex items-center bg-yellow-400 text-gray-900 px-4 py-2 rounded-full mb-4">
-              <i className="fas fa-sparkles mr-2"></i>
+              <i className="fas fa-star mr-2"></i>
               <span className="font-semibold">NEW FEATURE</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -459,6 +459,75 @@ export default function Home() {
               </p>
               <p className="font-semibold">— Akosua D.</p>
               <p className="text-sm text-gray-600">Parent of 6 year old</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Donation Section */}
+      <section className="bg-gradient-to-r from-yellow-50 to-teal-50 py-10 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Support Our Mission</h2>
+              <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+                Your donation helps preserve African languages and provides educational opportunities for children worldwide. 
+                Every contribution makes a difference in keeping our heritage alive.
+              </p>
+            </div>
+
+            {/* Donation Categories */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* FWS Learners */}
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <i className="fas fa-graduation-cap text-white text-2xl"></i>
+                  </div>
+                </div>
+                <h3 className="font-bold text-lg mb-2 text-center">FWS Cooperative Learners</h3>
+                <p className="text-sm text-gray-600 text-center">
+                  Support individual learners with tuition assistance, technology, and educational resources for their language journey.
+                </p>
+              </div>
+
+              {/* Partner Schools */}
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center">
+                    <i className="fas fa-school text-white text-2xl"></i>
+                  </div>
+                </div>
+                <h3 className="font-bold text-lg mb-2 text-center">FWS Partner Schools</h3>
+                <p className="text-sm text-gray-600 text-center">
+                  Build infrastructure and provide technology for partner schools across Africa to expand language education access.
+                </p>
+              </div>
+
+              {/* Language Councils */}
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center">
+                    <i className="fas fa-language text-white text-2xl"></i>
+                  </div>
+                </div>
+                <h3 className="font-bold text-lg mb-2 text-center">Language Councils</h3>
+                <p className="text-sm text-gray-600 text-center">
+                  Create and maintain language preservation initiatives for indigenous African languages and cultural heritage.
+                </p>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="text-center">
+              <a href="/donate" className="inline-block bg-gradient-to-r from-teal-500 to-teal-600 text-white px-8 py-4 rounded-md font-bold text-lg hover:from-teal-600 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <i className="fas fa-heart mr-2"></i>
+                Make a Donation
+              </a>
+              <p className="mt-4 text-sm text-gray-600">
+                <i className="fas fa-shield-alt mr-1 text-green-600"></i>
+                Secure donation • Tax-deductible • 501(c)(3) nonprofit
+              </p>
             </div>
           </div>
         </div>

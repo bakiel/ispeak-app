@@ -1,6 +1,6 @@
 'use client'
 
-import Navigation from '@/components/Navigation'
+import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -50,7 +50,7 @@ export default function CartPage() {
   if (cartItems.length === 0) {
     return (
       <>
-        <Navigation />
+        <ModernNavigation />
         <main className="min-h-screen bg-gray-50 py-12">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-3xl font-bold mb-6">Your Cart is Empty</h1>
@@ -70,7 +70,7 @@ export default function CartPage() {
 
   return (
     <>
-      <Navigation />
+      <ModernNavigation />
       
       <main className="min-h-screen bg-gray-50">
         {/* Header */}
