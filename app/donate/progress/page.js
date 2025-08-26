@@ -67,8 +67,19 @@ export default function DonationProgressPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-teal-600 text-white py-12 md:py-20">
-        <div className="container mx-auto px-4">
+      <section className="relative bg-gradient-to-r from-purple-600 to-teal-600 text-white py-12 md:py-20 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 opacity-15">
+          <img 
+            src="/images/generated/about-hero-educators.jpg"
+            alt="Educators making impact"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/90 to-teal-600/90"></div>
+        
+        <div className="relative container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl md:text-5xl font-bold mb-4">
               Your Impact in Action

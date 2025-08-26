@@ -53,12 +53,16 @@ export default function DonatePage() {
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-teal-600 via-teal-500 to-yellow-400 text-white overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
+        {/* Background Image */}
+        <div className="absolute inset-0 opacity-20">
+          <img 
+            src="/images/generated/children-counting-swahili.jpg"
+            alt="Children learning African languages"
+            className="w-full h-full object-cover"
+          />
         </div>
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-600/90 via-teal-500/85 to-yellow-400/90"></div>
         
         <div className="relative container mx-auto px-4 py-16 md:py-24">
           <div className="max-w-4xl mx-auto text-center">
@@ -269,6 +273,39 @@ export default function DonatePage() {
                   <h4 className="font-semibold mb-1">Tax Deductible</h4>
                   <p className="text-sm text-gray-600">501(c)(3) nonprofit organization</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Impact Stories Section */}
+      <section className="relative py-16 bg-white overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <img 
+            src="/images/generated/ispeak-method-pillars.jpg"
+            alt="Educational impact"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="relative container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-8">Your Donation Creates Real Change</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-yellow-50 rounded-lg p-6 border-2 border-yellow-200">
+                <div className="text-4xl mb-3">📚</div>
+                <h3 className="font-bold text-lg mb-2">$25</h3>
+                <p className="text-sm text-gray-700">Provides learning materials for one child for a month</p>
+              </div>
+              <div className="bg-teal-50 rounded-lg p-6 border-2 border-teal-200">
+                <div className="text-4xl mb-3">💻</div>
+                <h3 className="font-bold text-lg mb-2">$50</h3>
+                <p className="text-sm text-gray-700">Sponsors 2 online lessons with native speakers</p>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+                <div className="text-4xl mb-3">🎓</div>
+                <h3 className="font-bold text-lg mb-2">$100</h3>
+                <p className="text-sm text-gray-700">Provides a full month scholarship for one student</p>
               </div>
             </div>
           </div>
