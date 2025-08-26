@@ -3,12 +3,15 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function DonatePage() {
+  const router = useRouter()
   const [selectedCategories, setSelectedCategories] = useState([])
   const [donationType, setDonationType] = useState('one-time')
   const [amount, setAmount] = useState(0)
   const [isAnonymous, setIsAnonymous] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const categories = [
     {
@@ -45,6 +48,26 @@ export default function DonatePage() {
       // Monthly donations: minimum $5
       setAmount(Math.max(5, value))
     }
+  }
+
+  const handleDonate = async () => {
+    setIsProcessing(true)
+    
+    // Store donation details in session storage for confirmation page
+    const donationDetails = {
+      categories: selectedCategories.map(id => categories.find(c => c.id === id)),
+      amount,
+      donationType,
+      isAnonymous,
+      timestamp: new Date().toISOString()
+    }
+    
+    sessionStorage.setItem('pendingDonation', JSON.stringify(donationDetails))
+    
+    // Simulate processing delay
+    setTimeout(() => {
+      router.push('/donate/confirm')
+    }, 1000)
   }
 
   return (
@@ -102,9 +125,13 @@ export default function DonatePage() {
         </div>
       </section>
 
-      {/* Main Donation Section */}
-      <section className="py-10 md:py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
+      {/* Main Donation Section with African Pattern */}
+      <section className="py-10 md:py-16 bg-gray-50 relative">
+        {/* African Pattern Background */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="hero-pattern h-full"></div>
+        </div>
+        <div className="relative container mx-auto px-4">
 
           {/* Quick Links */}
           <div className="max-w-4xl mx-auto mb-8">
@@ -230,10 +257,21 @@ export default function DonatePage() {
           {/* Donate Button */}
           <div className="max-w-4xl mx-auto text-center">
             <button 
-              className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-md font-bold text-lg hover:bg-yellow-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={selectedCategories.length === 0 || amount === 0}
+              onClick={handleDonate}
+              className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-md font-bold text-lg hover:bg-yellow-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+              disabled={selectedCategories.length === 0 || amount === 0 || isProcessing}
             >
-              Donate ${amount} {donationType === 'monthly' ? 'Monthly' : ''}
+              {isProcessing ? (
+                <>
+                  <span className="animate-spin rounded-full h-5 w-5 border-2 border-gray-900 border-t-transparent"></span>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-heart"></i>
+                  Donate ${amount} {donationType === 'monthly' ? 'Monthly' : ''}
+                </>
+              )}
             </button>
             
             {selectedCategories.length === 0 && (
