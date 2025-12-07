@@ -69,13 +69,42 @@ router.get('/', async (req, res) => {
 
     const products = await query(sql, params);
 
-    // Parse JSON fields
-    const formattedProducts = products.map(p => ({
-      ...p,
-      images: p.images ? JSON.parse(p.images) : [],
-      tags: p.tags ? JSON.parse(p.tags) : [],
-      dimensions: p.dimensions ? JSON.parse(p.dimensions) : null
-    }));
+    // Parse JSON fields safely
+    const formattedProducts = products.map(p => {
+      let images = [];
+      let tags = [];
+      let dimensions = null;
+
+      // Safely parse images
+      if (p.images) {
+        try {
+          images = JSON.parse(p.images);
+        } catch {
+          // If not valid JSON, treat as single URL
+          images = [p.images];
+        }
+      }
+
+      // Safely parse tags
+      if (p.tags) {
+        try {
+          tags = JSON.parse(p.tags);
+        } catch {
+          tags = [];
+        }
+      }
+
+      // Safely parse dimensions
+      if (p.dimensions) {
+        try {
+          dimensions = JSON.parse(p.dimensions);
+        } catch {
+          dimensions = null;
+        }
+      }
+
+      return { ...p, images, tags, dimensions };
+    });
 
     res.json(formattedProducts);
   } catch (error) {
@@ -119,11 +148,40 @@ router.get('/slug/:slug', async (req, res) => {
       LIMIT 4
     `, [product.category_id, product.id]);
 
+    // Safely parse JSON fields
+    let images = [];
+    let tags = [];
+    let dimensions = null;
+
+    if (product.images) {
+      try {
+        images = JSON.parse(product.images);
+      } catch {
+        images = [product.images];
+      }
+    }
+
+    if (product.tags) {
+      try {
+        tags = JSON.parse(product.tags);
+      } catch {
+        tags = [];
+      }
+    }
+
+    if (product.dimensions) {
+      try {
+        dimensions = JSON.parse(product.dimensions);
+      } catch {
+        dimensions = null;
+      }
+    }
+
     res.json({
       ...product,
-      images: product.images ? JSON.parse(product.images) : [],
-      tags: product.tags ? JSON.parse(product.tags) : [],
-      dimensions: product.dimensions ? JSON.parse(product.dimensions) : null,
+      images,
+      tags,
+      dimensions,
       reviews,
       relatedProducts: related
     });
@@ -148,11 +206,41 @@ router.get('/:id', async (req, res) => {
     }
 
     const product = products[0];
+
+    // Safely parse JSON fields
+    let images = [];
+    let tags = [];
+    let dimensions = null;
+
+    if (product.images) {
+      try {
+        images = JSON.parse(product.images);
+      } catch {
+        images = [product.images];
+      }
+    }
+
+    if (product.tags) {
+      try {
+        tags = JSON.parse(product.tags);
+      } catch {
+        tags = [];
+      }
+    }
+
+    if (product.dimensions) {
+      try {
+        dimensions = JSON.parse(product.dimensions);
+      } catch {
+        dimensions = null;
+      }
+    }
+
     res.json({
       ...product,
-      images: product.images ? JSON.parse(product.images) : [],
-      tags: product.tags ? JSON.parse(product.tags) : [],
-      dimensions: product.dimensions ? JSON.parse(product.dimensions) : null
+      images,
+      tags,
+      dimensions
     });
   } catch (error) {
     console.error('Product fetch error:', error);
