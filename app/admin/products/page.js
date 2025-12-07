@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { storeQueries, adminAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -19,11 +19,7 @@ export default function ProductsList() {
 
   const fetchProducts = async () => {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('project_name', 'ispeak')
-      .order('name', { ascending: true })
+    const { data, error } = await storeQueries.getAllProducts()
 
     if (data) {
       setProducts(data)
@@ -36,13 +32,10 @@ export default function ProductsList() {
       return
     }
 
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', productId)
+    const { error } = await adminAPI.deleteProduct(productId)
 
     if (error) {
-      alert('Error deleting product: ' + error.message)
+      alert('Error deleting product: ' + (error.message || 'Unknown error'))
     } else {
       alert('Product deleted successfully!')
       fetchProducts()
@@ -51,10 +44,7 @@ export default function ProductsList() {
 
   const toggleStatus = async (productId, currentStatus) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active'
-    const { error } = await supabase
-      .from('products')
-      .update({ status: newStatus })
-      .eq('id', productId)
+    const { error } = await adminAPI.updateProduct(productId, { status: newStatus })
 
     if (!error) {
       fetchProducts()

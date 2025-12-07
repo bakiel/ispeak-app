@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { adminAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import { useRouter } from 'next/navigation'
@@ -63,13 +63,10 @@ export default function NewProduct() {
       }
     }
 
-    const { data, error } = await supabase
-      .from('products')
-      .insert([productData])
-      .select()
+    const { data, error } = await adminAPI.createProduct(productData)
 
     if (error) {
-      alert('Error creating product: ' + error.message)
+      alert('Error creating product: ' + (error.message || 'Unknown error'))
       setLoading(false)
     } else {
       alert('Product created successfully!')

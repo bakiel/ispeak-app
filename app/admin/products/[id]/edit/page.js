@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { productsAPI, adminAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import { useRouter } from 'next/navigation'
@@ -39,31 +39,28 @@ export default function EditProduct({ params }) {
   }, [productId])
 
   const fetchProduct = async () => {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('id', productId)
-      .single()
+    const { data, error } = await productsAPI.getById(productId)
 
     if (data) {
-      setProduct(data)
+      const productData = data.product || data
+      setProduct(productData)
       setFormData({
-        name: data.name || '',
-        sku: data.sku || '',
-        slug: data.slug || '',
-        price: data.price || '',
-        sale_price: data.sale_price || '',
-        description: data.description || '',
-        stock_quantity: data.stock_quantity || 0,
-        low_stock_threshold: data.low_stock_threshold || 10,
-        category: data.metadata?.collection?.slug || 'other',
-        featured: data.featured || false,
-        status: data.status || 'active',
-        images: data.images || [],
-        tags: data.tags || [],
-        colors: data.colors || [],
-        sizes: data.sizes || [],
-        metadata: data.metadata || {}
+        name: productData.name || '',
+        sku: productData.sku || '',
+        slug: productData.slug || '',
+        price: productData.price || '',
+        sale_price: productData.sale_price || '',
+        description: productData.description || '',
+        stock_quantity: productData.stock_quantity || 0,
+        low_stock_threshold: productData.low_stock_threshold || 10,
+        category: productData.metadata?.collection?.slug || productData.category?.slug || 'other',
+        featured: productData.featured || false,
+        status: productData.status || 'active',
+        images: productData.images || [],
+        tags: productData.tags || [],
+        colors: productData.colors || [],
+        sizes: productData.sizes || [],
+        metadata: productData.metadata || {}
       })
     }
     setLoading(false)
@@ -111,13 +108,10 @@ export default function EditProduct({ params }) {
       updated_at: new Date().toISOString()
     }
 
-    const { error } = await supabase
-      .from('products')
-      .update(updateData)
-      .eq('id', productId)
+    const { error } = await adminAPI.updateProduct(productId, updateData)
 
     if (error) {
-      alert('Error updating product: ' + error.message)
+      alert('Error updating product: ' + (error.message || 'Unknown error'))
       setSaving(false)
     } else {
       alert('Product updated successfully!')
@@ -130,13 +124,10 @@ export default function EditProduct({ params }) {
       return
     }
 
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', productId)
+    const { error } = await adminAPI.deleteProduct(productId)
 
     if (error) {
-      alert('Error deleting product: ' + error.message)
+      alert('Error deleting product: ' + (error.message || 'Unknown error'))
     } else {
       alert('Product deleted successfully!')
       router.push('/admin/dashboard')

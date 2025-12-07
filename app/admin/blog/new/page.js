@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { blogAPI, adminAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import { useRouter } from 'next/navigation'
@@ -34,13 +34,11 @@ export default function NewBlogPost() {
   }, [])
 
   const fetchCategories = async () => {
-    const { data } = await supabase
-      .from('blog_categories')
-      .select('*')
-      .order('name')
+    const { data } = await blogAPI.getCategories()
 
     if (data) {
-      setCategories(data)
+      const catList = data.categories || data || []
+      setCategories(catList)
     }
   }
 
@@ -65,13 +63,10 @@ export default function NewBlogPost() {
       published_at: formData.is_published ? new Date().toISOString() : null
     }
 
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .insert([postData])
-      .select()
+    const { data, error } = await adminAPI.createPost(postData)
 
     if (error) {
-      alert('Error creating post: ' + error.message)
+      alert('Error creating post: ' + (error.message || 'Unknown error'))
       setLoading(false)
     } else {
       alert('Post created successfully!')

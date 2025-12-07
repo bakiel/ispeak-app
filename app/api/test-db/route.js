@@ -1,37 +1,33 @@
-import { supabase } from '@/lib/supabase'
+import { productsAPI } from '@/lib/api-client'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    // Test Supabase connection and fetch products
-    const { data, error } = await supabase
-      .from('products')
-      .select('name, stock_quantity, in_stock')
-      .eq('project_name', 'ispeak')
-      .limit(5)
+    // Test MySQL backend API connection
+    const { data, error } = await productsAPI.getAll({ limit: 5 })
 
     if (error) {
-      return NextResponse.json({ 
-        error: 'Supabase query failed', 
+      return NextResponse.json({
+        error: 'MySQL API query failed',
         details: error.message,
-        supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT SET',
-        supabase_key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET'
+        api_url: process.env.NEXT_PUBLIC_API_URL ? 'SET' : 'NOT SET'
       }, { status: 500 })
     }
 
-    return NextResponse.json({ 
+    const products = data?.products || data || []
+
+    return NextResponse.json({
       success: true,
-      products: data,
-      count: data?.length || 0,
+      products: products.map(p => ({ name: p.name, stock_quantity: p.stock_quantity, in_stock: p.in_stock })),
+      count: products.length,
       environment: {
-        supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'CONFIGURED' : 'MISSING',
-        supabase_key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'CONFIGURED' : 'MISSING'
+        api_url: process.env.NEXT_PUBLIC_API_URL ? 'CONFIGURED' : 'MISSING'
       }
     })
   } catch (error) {
-    return NextResponse.json({ 
-      error: 'Server error', 
-      message: error.message 
+    return NextResponse.json({
+      error: 'Server error',
+      message: error.message
     }, { status: 500 })
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { storeQueries, adminAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -26,11 +26,7 @@ export default function AdminDashboard() {
 
   const fetchProducts = async () => {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('project_name', 'ispeak')
-      .order('name', { ascending: true })
+    const { data, error } = await storeQueries.getAllProducts()
 
     if (data) {
       setProducts(data)
@@ -110,16 +106,13 @@ export default function AdminDashboard() {
     // Remove the category field as it's not a database column
     delete updatedData.category
 
-    const { error } = await supabase
-      .from('products')
-      .update(updatedData)
-      .eq('id', productId)
+    const { error } = await adminAPI.updateProduct(productId, updatedData)
 
     if (!error) {
       setEditingProduct(null)
       fetchProducts()
     } else {
-      alert('Error saving product: ' + error.message)
+      alert('Error saving product: ' + (error.message || 'Unknown error'))
     }
   }
 
@@ -136,14 +129,11 @@ export default function AdminDashboard() {
     const product = products.find(p => p.id === productId)
     const currentStock = product.stock_quantity || 0
     const newStock = Math.max(0, currentStock + change)
-    
-    const { error } = await supabase
-      .from('products')
-      .update({ 
-        stock_quantity: newStock,
-        in_stock: newStock > 0
-      })
-      .eq('id', productId)
+
+    const { error } = await adminAPI.updateProduct(productId, {
+      stock_quantity: newStock,
+      in_stock: newStock > 0
+    })
 
     if (!error) fetchProducts()
   }

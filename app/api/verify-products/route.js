@@ -1,42 +1,34 @@
-import { supabase } from '@/lib/supabase'
+import { productsAPI } from '@/lib/api-client'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    // Check if Supabase is configured
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    
-    const isConfigured = supabaseUrl && supabaseKey && 
-      supabaseUrl !== 'your_supabase_url_here' && 
-      supabaseKey !== 'your_supabase_anon_key_here'
-    
-    // Query products
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('project_name', 'ispeak')
-      .eq('status', 'active')
-      .order('name')
-    
+    // Check if API is configured
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL
+    const isConfigured = !!apiUrl
+
+    // Query products from MySQL backend
+    const { data, error } = await productsAPI.getAll({ status: 'active' })
+
     if (error) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: error.message,
         isConfigured,
-        supabaseUrl: supabaseUrl ? 'Set' : 'Not set',
-        query: "from('products').select('*').eq('project_name', 'ispeak').eq('status', 'active')"
+        apiUrl: apiUrl ? 'Set' : 'Not set'
       }, { status: 500 })
     }
-    
+
+    const products = data?.products || data || []
+
     return NextResponse.json({
       isConfigured,
-      count: data?.length || 0,
-      products: data || [],
-      supabaseUrl: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'Not set',
+      count: products.length,
+      products: products,
+      apiUrl: apiUrl ? apiUrl.substring(0, 30) + '...' : 'Not set',
       timestamp: new Date().toISOString()
     })
   } catch (error) {
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: error.message,
       type: 'catch block error'
     }, { status: 500 })

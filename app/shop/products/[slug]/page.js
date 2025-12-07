@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { productsAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import ProductDetailClient from '@/components/shop/ProductDetailClient'
@@ -8,24 +8,21 @@ import { getProductBySlug, getRelatedProducts, getProductReviews } from '@/lib/p
 
 // Get product by slug with enhanced data integration
 async function getProduct(slug) {
-  // First try to get from Supabase
+  // First try to get from MySQL API
   try {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('slug', slug)
-      .single()
+    const { data, error } = await productsAPI.getBySlug(slug)
 
     if (data && !error) {
+      const product = data.product || data
       // Map stock_quantity to inventory_quantity for frontend compatibility
       return {
-        ...data,
-        inventory_quantity: data.stock_quantity || 0,
-        in_stock: data.in_stock || (data.stock_quantity > 0)
+        ...product,
+        inventory_quantity: product.stock_quantity || 0,
+        in_stock: product.stock_quantity > 0
       }
     }
   } catch (error) {
-    console.log('Supabase error, using mock data:', error.message)
+    console.log('API error, using mock data:', error.message)
   }
 
   // Fallback to comprehensive mock data
@@ -35,24 +32,22 @@ async function getProduct(slug) {
 // Get related products with enhanced filtering
 async function getProductRelated(productId, collectionSlug, limit = 4) {
   try {
-    // Filter to only show iSPEAK educational products
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .neq('id', productId)
-      .or('slug.like.ispeak-%,slug.like.paji-%,slug.like.african-%,slug.like.teacher-%,slug.like.amharic-%,slug.like.yoruba-%,slug.like.kiswahili-%,slug.like.twi-%')
-      .limit(limit)
+    const { data, error } = await productsAPI.getAll({ limit })
 
-    if (data && !error && data.length > 0) {
-      // Map stock_quantity to inventory_quantity for frontend compatibility
-      return data.map(product => ({
-        ...product,
-        inventory_quantity: product.stock_quantity || 0,
-        in_stock: product.in_stock || (product.stock_quantity > 0)
-      }))
+    if (data && !error) {
+      const productList = data.products || data || []
+      // Filter out current product and map fields
+      return productList
+        .filter(p => p.id !== productId)
+        .slice(0, limit)
+        .map(product => ({
+          ...product,
+          inventory_quantity: product.stock_quantity || 0,
+          in_stock: product.stock_quantity > 0
+        }))
     }
   } catch (error) {
-    console.log('Supabase error, using mock data for related products:', error.message)
+    console.log('API error, using mock data for related products:', error.message)
   }
 
   // Fallback to comprehensive mock data

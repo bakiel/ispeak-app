@@ -8,7 +8,11 @@ const router = express.Router();
 // Get all published posts
 router.get('/', async (req, res) => {
   try {
-    const { category, search, limit = 20, offset = 0 } = req.query;
+    const { category, search, limit = '20', offset = '0' } = req.query;
+
+    // Parse limit and offset as integers upfront
+    const limitInt = parseInt(limit, 10) || 20;
+    const offsetInt = parseInt(offset, 10) || 0;
 
     let sql = `
       SELECT p.id, p.title, p.slug, p.excerpt, p.featured_image,
@@ -30,8 +34,8 @@ router.get('/', async (req, res) => {
       params.push(`%${search}%`, `%${search}%`);
     }
 
-    sql += ' ORDER BY p.published_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
+    // Use string interpolation for LIMIT/OFFSET to avoid prepared statement issues
+    sql += ` ORDER BY p.published_at DESC LIMIT ${limitInt} OFFSET ${offsetInt}`;
 
     const posts = await query(sql, params);
 
@@ -117,7 +121,8 @@ router.get('/categories', async (req, res) => {
 // Get featured/recent posts for homepage
 router.get('/featured', async (req, res) => {
   try {
-    const { limit = 3 } = req.query;
+    const { limit = '3' } = req.query;
+    const limitInt = parseInt(limit, 10) || 3;
 
     const posts = await query(`
       SELECT p.id, p.title, p.slug, p.excerpt, p.featured_image,
@@ -127,8 +132,8 @@ router.get('/featured', async (req, res) => {
       LEFT JOIN blog_categories c ON p.category_id = c.id
       WHERE p.is_published = TRUE
       ORDER BY p.views DESC, p.published_at DESC
-      LIMIT ?
-    `, [parseInt(limit)]);
+      LIMIT ${limitInt}
+    `);
 
     res.json(posts);
   } catch (error) {

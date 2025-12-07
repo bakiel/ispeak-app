@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { blogAPI, adminAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -20,27 +20,23 @@ export default function BlogAdmin() {
 
   const fetchData = async () => {
     setLoading(true)
-    
+
     // Fetch posts and categories in parallel
     const [postsResult, categoriesResult] = await Promise.all([
-      supabase
-        .from('blog_posts')
-        .select('*')
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('blog_categories')
-        .select('*')
-        .order('name')
+      blogAPI.getAllPosts(),
+      blogAPI.getCategories()
     ])
 
     if (postsResult.data) {
-      setPosts(postsResult.data)
+      const postsList = postsResult.data.posts || postsResult.data || []
+      setPosts(postsList)
     }
-    
+
     if (categoriesResult.data) {
-      setCategories(categoriesResult.data)
+      const catList = categoriesResult.data.categories || categoriesResult.data || []
+      setCategories(catList)
     }
-    
+
     setLoading(false)
   }
 
@@ -49,13 +45,10 @@ export default function BlogAdmin() {
       return
     }
 
-    const { error } = await supabase
-      .from('blog_posts')
-      .delete()
-      .eq('id', postId)
+    const { error } = await adminAPI.deletePost(postId)
 
     if (error) {
-      alert('Error deleting post: ' + error.message)
+      alert('Error deleting post: ' + (error.message || 'Unknown error'))
     } else {
       alert('Post deleted successfully!')
       fetchData()
@@ -69,10 +62,7 @@ export default function BlogAdmin() {
       published_at: newStatus ? new Date().toISOString() : null
     }
 
-    const { error } = await supabase
-      .from('blog_posts')
-      .update(updateData)
-      .eq('id', postId)
+    const { error } = await adminAPI.updatePost(postId, updateData)
 
     if (!error) {
       fetchData()

@@ -1,39 +1,34 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { blogAPI, productsAPI } from '@/lib/api-client'
 
-export default function TestSupabase() {
-  const [status, setStatus] = useState('Testing connection...')
+export default function TestAPI() {
+  const [status, setStatus] = useState('Testing API connection...')
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     async function testConnection() {
       try {
-        // Test 1: Basic connection
-        const { data: posts, error: postsError } = await supabase
-          .from('blog_posts')
-          .select('id, title')
-          .limit(1)
+        // Test 1: Blog posts
+        const postsResult = await blogAPI.getRecentPosts(1)
 
-        if (postsError) throw postsError
+        if (postsResult.error) throw new Error(postsResult.error.message)
 
-        // Test 2: Categories
-        const { data: categories, error: catError } = await supabase
-          .from('blog_categories')
-          .select('id, name')
+        // Test 2: Products
+        const productsResult = await productsAPI.getAll({ limit: 3 })
 
-        if (catError) throw catError
+        if (productsResult.error) throw new Error(productsResult.error.message)
 
-        setStatus('✅ Connection successful!')
+        setStatus('Connection successful!')
         setData({
-          posts: posts || [],
-          categories: categories || []
+          posts: postsResult.data?.posts || postsResult.data || [],
+          products: (productsResult.data?.products || productsResult.data || []).slice(0, 3)
         })
       } catch (err) {
-        setStatus('❌ Connection failed')
+        setStatus('Connection failed')
         setError(err.message)
-        console.error('Supabase test error:', err)
+        console.error('API test error:', err)
       }
     }
 
@@ -42,8 +37,8 @@ export default function TestSupabase() {
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <h1 className="text-3xl font-bold mb-8">Supabase Connection Test</h1>
-      
+      <h1 className="text-3xl font-bold mb-8">MySQL API Connection Test</h1>
+
       <div className="bg-gray-50 p-6 rounded-lg mb-6">
         <h2 className="text-xl font-semibold mb-2">Status:</h2>
         <p className="text-lg">{status}</p>
@@ -65,8 +60,7 @@ export default function TestSupabase() {
 
       <div className="mt-8 bg-blue-50 p-6 rounded-lg">
         <h3 className="font-semibold mb-2">Connection Details:</h3>
-        <p>URL: {process.env.NEXT_PUBLIC_SUPABASE_URL}</p>
-        <p>Key: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 20)}...</p>
+        <p>API URL: {process.env.NEXT_PUBLIC_API_URL || 'Using default'}</p>
       </div>
     </div>
   )

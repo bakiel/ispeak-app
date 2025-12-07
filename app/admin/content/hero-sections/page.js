@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { adminAPI } from '@/lib/api-client'
 
 export default function HeroSectionsPage() {
   const [heroSections, setHeroSections] = useState([])
@@ -18,15 +18,18 @@ export default function HeroSectionsPage() {
 
   async function fetchHeroSections() {
     try {
-      const { data, error } = await supabase
-        .from('hero_sections')
-        .select('*')
-        .order('page_slug')
-      
-      if (error) throw error
-      setHeroSections(data || [])
+      // Hero sections API endpoint - falls back to empty if not available
+      const { data, error } = await adminAPI.getHeroSections()
+
+      if (error) {
+        console.log('Using fallback hero sections data')
+        setHeroSections([])
+      } else {
+        setHeroSections(data?.heroSections || data || [])
+      }
     } catch (error) {
       console.error('Error fetching hero sections:', error)
+      setHeroSections([])
     } finally {
       setLoading(false)
     }
@@ -53,26 +56,23 @@ export default function HeroSectionsPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const { error } = await supabase
-        .from('hero_sections')
-        .update({
-          subtitle: formData.subtitle,
-          title: formData.title,
-          description: formData.description,
-          primary_cta_text: formData.primary_cta_text,
-          primary_cta_link: formData.primary_cta_link,
-          secondary_cta_text: formData.secondary_cta_text,
-          secondary_cta_link: formData.secondary_cta_link,
-          image_url: formData.image_url,
-          image_alt: formData.image_alt,
-          mascot_visible: formData.mascot_visible,
-          is_active: formData.is_active,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', editingSection)
-      
+      const { error } = await adminAPI.updateHeroSection(editingSection, {
+        subtitle: formData.subtitle,
+        title: formData.title,
+        description: formData.description,
+        primary_cta_text: formData.primary_cta_text,
+        primary_cta_link: formData.primary_cta_link,
+        secondary_cta_text: formData.secondary_cta_text,
+        secondary_cta_link: formData.secondary_cta_link,
+        image_url: formData.image_url,
+        image_alt: formData.image_alt,
+        mascot_visible: formData.mascot_visible,
+        is_active: formData.is_active,
+        updated_at: new Date().toISOString()
+      })
+
       if (error) throw error
-      
+
       // Refresh data
       await fetchHeroSections()
       setEditingSection(null)

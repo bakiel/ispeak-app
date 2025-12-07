@@ -7,7 +7,11 @@ const router = express.Router();
 // Get all products (public)
 router.get('/', async (req, res) => {
   try {
-    const { category, status, featured, search, sort, limit = 50, offset = 0 } = req.query;
+    const { category, status, featured, search, sort, limit = '50', offset = '0' } = req.query;
+
+    // Parse limit and offset as integers upfront
+    const limitInt = parseInt(limit, 10) || 50;
+    const offsetInt = parseInt(offset, 10) || 0;
 
     let sql = `
       SELECT p.*, c.name as category_name, c.slug as category_slug
@@ -22,7 +26,7 @@ router.get('/', async (req, res) => {
       sql += ' AND p.status = ?';
       params.push(status);
     } else {
-      sql += ' AND p.status = "active"';
+      sql += " AND p.status = 'active'";
     }
 
     // Filter by category
@@ -60,8 +64,8 @@ router.get('/', async (req, res) => {
         sql += ' ORDER BY p.featured DESC, p.created_at DESC';
     }
 
-    sql += ' LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
+    // Use string interpolation for LIMIT/OFFSET to avoid prepared statement issues
+    sql += ` LIMIT ${limitInt} OFFSET ${offsetInt}`;
 
     const products = await query(sql, params);
 

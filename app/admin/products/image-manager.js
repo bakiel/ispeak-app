@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { adminAPI } from '@/lib/api-client'
 
 export default function ImageManager({ productId, currentImages = [] }) {
   const [images, setImages] = useState(currentImages)
@@ -37,12 +37,9 @@ export default function ImageManager({ productId, currentImages = [] }) {
     if (uploadedUrls.length > 0) {
       const newImages = [...images, ...uploadedUrls]
       setImages(newImages)
-      
+
       // Update in database
-      await supabase
-        .from('products')
-        .update({ images: newImages })
-        .eq('id', productId)
+      await adminAPI.updateProduct(productId, { images: newImages })
     }
 
     setUploading(false)
@@ -81,28 +78,22 @@ export default function ImageManager({ productId, currentImages = [] }) {
   const removeImage = async (indexToRemove) => {
     const newImages = images.filter((_, index) => index !== indexToRemove)
     setImages(newImages)
-    
+
     // Update in database
-    await supabase
-      .from('products')
-      .update({ images: newImages })
-      .eq('id', productId)
+    await adminAPI.updateProduct(productId, { images: newImages })
   }
 
   // Move image position
   const moveImage = async (fromIndex, direction) => {
     const newImages = [...images]
     const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1
-    
+
     if (toIndex >= 0 && toIndex < images.length) {
       [newImages[fromIndex], newImages[toIndex]] = [newImages[toIndex], newImages[fromIndex]]
       setImages(newImages)
-      
+
       // Update in database
-      await supabase
-        .from('products')
-        .update({ images: newImages })
-        .eq('id', productId)
+      await adminAPI.updateProduct(productId, { images: newImages })
     }
   }
 
