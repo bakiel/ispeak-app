@@ -494,6 +494,7 @@ INSERT INTO users (email, password_hash, first_name, last_name, role, email_veri
 -- VIEWS FOR ANALYTICS
 -- =====================================================
 
+-- Simple product stats view (without variables)
 CREATE VIEW v_product_stats AS
 SELECT
     p.id,
@@ -502,15 +503,11 @@ SELECT
     p.price,
     p.stock_quantity,
     p.status,
-    COUNT(DISTINCT oi.id) as total_orders,
-    COALESCE(SUM(JSON_EXTRACT(o.items, CONCAT('$[', oi.idx, '].quantity'))), 0) as total_sold,
-    AVG(pr.rating) as avg_rating,
+    COALESCE(AVG(pr.rating), 0) as avg_rating,
     COUNT(DISTINCT pr.id) as review_count
 FROM products p
-LEFT JOIN orders o ON JSON_CONTAINS(o.items, JSON_OBJECT('product_id', p.id))
-LEFT JOIN (SELECT @row := @row + 1 as idx, id FROM orders, (SELECT @row := -1) r) oi ON oi.id = o.id
 LEFT JOIN product_reviews pr ON pr.product_id = p.id AND pr.status = 'approved'
-GROUP BY p.id;
+GROUP BY p.id, p.name, p.slug, p.price, p.stock_quantity, p.status;
 
 CREATE VIEW v_daily_sales AS
 SELECT
