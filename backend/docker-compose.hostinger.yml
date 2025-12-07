@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ispeak-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: iSpeak2024SecureRoot!
+      MYSQL_DATABASE: ispeak
+      MYSQL_USER: ispeak_user
+      MYSQL_PASSWORD: iSpeak2024SecureDB!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  api:
+    image: node:20-alpine
+    container_name: ispeak-api
+    restart: always
+    working_dir: /app
+    command: sh -c "npm install && node src/server.js"
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ispeak
+      DB_USER: ispeak_user
+      DB_PASSWORD: iSpeak2024SecureDB!
+      JWT_SECRET: iSpeakJWTSecret2024VerySecureKeyAtLeast32Chars!
+      CORS_ORIGIN: https://ispeak-app-prod.vercel.app,http://localhost:3000
+    volumes:
+      - ./api:/app
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
