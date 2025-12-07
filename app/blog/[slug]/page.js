@@ -3,7 +3,7 @@ import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Section from '@/components/ui/Section'
 import BlogPostContent from '@/components/blog/BlogPostContent'
-import { blogQueries } from '@/lib/supabase'
+import { blogQueries } from '@/lib/api-client'
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {

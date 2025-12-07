@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { productsAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/shop/ProductCard'
@@ -15,101 +15,89 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 async function getProducts(filters = {}) {
-  // Simulate API delay for realistic UX
-  await new Promise(resolve => setTimeout(resolve, 100))
-  
   const { collection, search, featured, sale, newArrivals } = filters
-  
-  try {
-    // First try to get from Supabase if available
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('project_name', 'ispeak')
-      .eq('status', 'active')
-      .limit(100) // Explicitly request up to 100 products
 
-    console.log('Supabase query result:', { data, error })
+  try {
+    // First try to get from MySQL API
+    const apiFilters = {}
+    if (collection) apiFilters.category = collection
+    if (featured) apiFilters.featured = true
+
+    const { data, error } = await productsAPI.getAll(apiFilters)
 
     if (data && !error) {
-      // Map Supabase fields to match frontend expectations
-      let mappedData = data.map(product => ({
+      // Map API response to frontend expectations
+      let productList = data.products || data || []
+      let mappedData = productList.map(product => ({
         ...product,
-        inventory_quantity: product.stock_quantity || 0, // Map stock_quantity to inventory_quantity
-        in_stock: product.in_stock || (product.stock_quantity > 0),
-        collection: product.metadata?.collection || null // Extract collection from metadata
+        inventory_quantity: product.stock_quantity || 0,
+        in_stock: product.stock_quantity > 0,
+        collection: product.category ? {
+          name: product.category.name,
+          slug: product.category.slug
+        } : null
       }))
-      
-      // Filter Supabase data based on parameters
+
+      // Apply client-side filters
       let filteredData = mappedData
-      
-      if (collection) {
-        filteredData = filteredData.filter(product => product.collection?.slug === collection)
-      }
-      
+
       if (search) {
         const searchTerm = search.toLowerCase()
-        filteredData = filteredData.filter(product => 
+        filteredData = filteredData.filter(product =>
           product.name.toLowerCase().includes(searchTerm) ||
-          product.description.toLowerCase().includes(searchTerm)
+          (product.description && product.description.toLowerCase().includes(searchTerm))
         )
       }
-      
-      if (featured) {
-        filteredData = filteredData.filter(product => product.featured)
-      }
-      
+
       if (sale) {
         filteredData = filteredData.filter(product => product.sale_price && product.sale_price < product.price)
       }
-      
+
       if (newArrivals) {
-        // Filter products created in the last 30 days
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-        filteredData = filteredData.filter(product => new Date(product.createdAt) > thirtyDaysAgo)
+        filteredData = filteredData.filter(product => new Date(product.created_at) > thirtyDaysAgo)
       }
-      
-      console.log('Returning Supabase data:', filteredData.length, 'products')
+
+      console.log('Returning API data:', filteredData.length, 'products')
       return filteredData
     }
-    console.log('Supabase data empty or error, falling back to mock data')
+    console.log('API data empty or error, falling back to mock data')
   } catch (error) {
-    console.log('Supabase error, using mock data:', error.message)
+    console.log('API error, using mock data:', error.message)
   }
 
   // Fallback to comprehensive mock data with advanced filtering
   console.log('Using mock data fallback')
   let filteredProducts = products.filter(product => product.isActive)
-  
+
   if (collection) {
     filteredProducts = filteredProducts.filter(product => product.collection.slug === collection)
   }
-  
+
   if (search) {
     const searchTerm = search.toLowerCase()
-    filteredProducts = filteredProducts.filter(product => 
+    filteredProducts = filteredProducts.filter(product =>
       product.name.toLowerCase().includes(searchTerm) ||
       product.description.toLowerCase().includes(searchTerm) ||
       product.collection.name.toLowerCase().includes(searchTerm)
     )
   }
-  
+
   if (featured) {
     filteredProducts = filteredProducts.filter(product => product.featured)
   }
-  
+
   if (sale) {
     filteredProducts = filteredProducts.filter(product => product.sale_price && product.sale_price < product.price)
   }
-  
+
   if (newArrivals) {
-    // Filter products created in the last 30 days
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
     filteredProducts = filteredProducts.filter(product => new Date(product.createdAt) > thirtyDaysAgo)
   }
-  
+
   return filteredProducts
 }
 

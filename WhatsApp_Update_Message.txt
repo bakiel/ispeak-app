@@ -1,0 +1,25 @@
+Shalom,
+
+We have updated the coming soon page to display a more general message for the shop section. Here are the key updates we've completed over the past two days:
+
+Platform Updates Completed:
+- Implemented complete donation system with three categories (FWS Cooperative Learners, Partner Schools, Language Councils)
+- Created admin dashboard for managing donations, blog posts, and products
+- Added prominent Donate button to navigation header for better visibility
+- Implemented global search functionality across the platform
+- Removed countdown timer from homepage for cleaner presentation
+- Fixed all feature card styling and button consistency issues
+- Enhanced mobile responsiveness throughout the site
+
+Live Links:
+Production Site: https://ispeak-app-prod.vercel.app
+Donation Page: https://ispeak-app-prod.vercel.app/donate
+Donation Progress: https://ispeak-app-prod.vercel.app/donate/progress
+Admin Login: https://ispeak-app-prod.vercel.app/admin/login
+
+We will keep progressing with the development. The next stage is to fully complete the backend integration with Supabase database tables, followed by payment gateway integration with Stripe and PayPal.
+
+Technical documentation has been prepared and is available in the attached PDF report.
+
+Best regards,
+Development Team

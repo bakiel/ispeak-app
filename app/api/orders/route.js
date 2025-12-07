@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { ecommerceQueries } from '@/lib/supabase'
+import { ecommerceQueries } from '@/lib/api-client'
 
 // Fallback mock database for when Supabase is not configured
 let orders = []

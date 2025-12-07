@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { blogQueries } from '@/lib/supabase'
+import { blogQueries } from '@/lib/api-client'
 
 export async function GET() {
   try {
