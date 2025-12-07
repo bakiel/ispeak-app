@@ -5,6 +5,10 @@ import Section, { SectionTitle, SectionSubtitle } from '@/components/ui/Section'
 import BlogList from '@/components/blog/BlogList'
 import { blogQueries } from '@/lib/api-client'
 
+// Force dynamic rendering to avoid stale data
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // Generate metadata for SEO
 export const metadata = {
   title: 'Blog | iSPEAK Language Learning',
