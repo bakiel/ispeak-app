@@ -4,6 +4,7 @@ import Footer from '@/components/Footer'
 import Section, { SectionTitle, SectionSubtitle } from '@/components/ui/Section'
 import BlogList from '@/components/blog/BlogList'
 import { blogQueries } from '@/lib/api-client'
+import { blogPosts as fallbackPosts, blogCategories as fallbackCategories } from '@/lib/blogData'
 
 // Force dynamic rendering to avoid stale data
 export const dynamic = 'force-dynamic'
@@ -64,44 +65,38 @@ function BlogLoading() {
 
 // Server component to fetch data
 async function BlogContent() {
-  // Fetch posts and categories in parallel
-  const [postsResult, categoriesResult] = await Promise.all([
-    blogQueries.getAllPosts(),
-    blogQueries.getCategories()
-  ])
+  let posts = []
+  let categories = []
 
-  if (postsResult.error) {
-    return (
-      <div className="text-center py-12">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-          <svg 
-            className="w-12 h-12 text-red-500 mx-auto mb-4" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" 
-            />
-          </svg>
-          <h3 className="text-lg font-semibold text-red-800 mb-2">Unable to Load Blog Posts</h3>
-          <p className="text-red-600">
-            {postsResult.error.error || 'An error occurred while loading the blog posts. Please try again later.'}
-          </p>
-        </div>
-      </div>
-    )
+  try {
+    // Try to fetch from API
+    const [postsResult, categoriesResult] = await Promise.all([
+      blogQueries.getAllPosts(),
+      blogQueries.getCategories()
+    ])
+
+    if (postsResult.data && postsResult.data.length > 0) {
+      posts = postsResult.data
+      console.log('Blog: Using API data:', posts.length, 'posts')
+    }
+
+    if (categoriesResult.data && categoriesResult.data.length > 0) {
+      categories = categoriesResult.data
+    }
+  } catch (error) {
+    console.log('Blog API error, using fallback data:', error.message)
   }
 
-  const posts = postsResult.data || []
-  const categories = categoriesResult.data || []
+  // Use fallback data if API returned empty
+  if (posts.length === 0) {
+    console.log('Blog: Using fallback data')
+    posts = fallbackPosts
+    categories = fallbackCategories
+  }
 
   return (
-    <BlogList 
-      initialPosts={posts} 
+    <BlogList
+      initialPosts={posts}
       categories={categories}
     />
   )
