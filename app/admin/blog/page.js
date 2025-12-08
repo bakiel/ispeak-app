@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { blogAPI, adminAPI } from '@/lib/api-client'
+import { adminAPI } from '@/lib/api-client'
 import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -21,20 +21,29 @@ export default function BlogAdmin() {
   const fetchData = async () => {
     setLoading(true)
 
-    // Fetch posts and categories in parallel
-    const [postsResult, categoriesResult] = await Promise.all([
-      blogAPI.getAllPosts(),
-      blogAPI.getCategories()
-    ])
+    try {
+      // Use local Next.js API proxy to avoid mixed content issues
+      const [postsResponse, categoriesResponse] = await Promise.all([
+        fetch('/api/blog'),
+        fetch('/api/blog/categories')
+      ])
 
-    if (postsResult.data) {
-      const postsList = postsResult.data.posts || postsResult.data || []
-      setPosts(postsList)
-    }
+      const postsResult = await postsResponse.json()
+      const categoriesResult = await categoriesResponse.json()
 
-    if (categoriesResult.data) {
-      const catList = categoriesResult.data.categories || categoriesResult.data || []
-      setCategories(catList)
+      if (postsResult.data) {
+        setPosts(postsResult.data)
+      } else if (postsResult.posts) {
+        setPosts(postsResult.posts)
+      }
+
+      if (categoriesResult.data) {
+        setCategories(categoriesResult.data)
+      } else if (Array.isArray(categoriesResult)) {
+        setCategories(categoriesResult)
+      }
+    } catch (error) {
+      console.error('Error fetching blog data:', error)
     }
 
     setLoading(false)
