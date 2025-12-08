@@ -5,8 +5,12 @@ import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 
-// Use local API proxy for browser requests, direct URL for image display
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+// Backend base URL for image display (strip /api suffix if present)
+const getBackendBase = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+  return base.replace(/\/api\/?$/, '')
+}
+const BACKEND_BASE = getBackendBase()
 
 export default function MediaLibrary() {
   const [media, setMedia] = useState([])
@@ -49,8 +53,8 @@ export default function MediaLibrary() {
 
   const fetchFolders = async () => {
     try {
-      // Folders endpoint - use direct API since it's read-only
-      const response = await fetch(`${API_BASE}/api/media/folders/list`)
+      // Folders endpoint - use local API proxy
+      const response = await fetch(`/api/media/folders`)
       const data = await response.json()
       setFolders(data || [])
     } catch (error) {
@@ -121,8 +125,8 @@ export default function MediaLibrary() {
     setUploading(true)
 
     try {
-      // Use direct backend URL for URL import (server-side operation)
-      const response = await fetch(`${API_BASE}/api/media/upload-url`, {
+      // Use local API proxy for URL import
+      const response = await fetch(`/api/media/upload-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -180,8 +184,8 @@ export default function MediaLibrary() {
 
   const handleReanalyze = async (id) => {
     try {
-      // Use direct backend URL for AI analysis (server operation)
-      const response = await fetch(`${API_BASE}/api/media/${id}/analyze`, {
+      // Use local API proxy for AI analysis
+      const response = await fetch(`/api/media/${id}/analyze`, {
         method: 'POST'
       })
 
@@ -207,7 +211,7 @@ export default function MediaLibrary() {
 
   const getImageUrl = (item) => {
     if (item.url?.startsWith('http')) return item.url
-    return `${API_BASE}${item.url}`
+    return `${BACKEND_BASE}${item.url}`
   }
 
   return (

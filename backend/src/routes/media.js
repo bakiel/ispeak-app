@@ -9,7 +9,7 @@ const { authenticate, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
 
-// OpenRouter API for GPT-4o nano image analysis
+// OpenRouter API for GPT-5 nano image analysis
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // Max file size after compression (400KB)
