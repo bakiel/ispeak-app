@@ -217,12 +217,12 @@ router.post('/student/enroll', authenticate, [
 // Get all student progress (no language filter)
 router.get('/student/progress', authenticate, async (req, res) => {
   try {
-    // Try with student_id first (schema), then user_id (alternate)
+    // Use user_id column (matches actual database schema)
     let progress = await query(`
       SELECT sp.*, l.name as language_name, l.native_name, l.slug as language_slug
       FROM student_progress sp
       JOIN languages l ON sp.language_id = l.id
-      WHERE sp.student_id = ?
+      WHERE sp.user_id = ?
     `, [req.user.id]);
 
     // Calculate overall stats
@@ -252,7 +252,7 @@ router.get('/student/achievements', authenticate, async (req, res) => {
         SELECT a.*, sa.earned_at
         FROM student_achievements sa
         JOIN achievements a ON sa.achievement_id = a.id
-        WHERE sa.student_id = ?
+        WHERE sa.user_id = ?
         ORDER BY sa.earned_at DESC
       `, [req.user.id]);
     } catch (e) {
@@ -286,9 +286,9 @@ router.get('/student/educators', authenticate, async (req, res) => {
   try {
     const { language_id } = req.query;
 
-    // Simple query that works regardless of whether educator_languages table exists
+    // Simple query that works with actual database schema (users table has no bio column)
     let sql = `
-      SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio,
+      SELECT u.id, u.first_name, u.last_name, u.avatar_url,
              (SELECT COUNT(*) FROM lesson_bookings WHERE educator_id = u.id AND status = 'completed') as total_lessons
       FROM users u
       WHERE u.role = 'educator'
