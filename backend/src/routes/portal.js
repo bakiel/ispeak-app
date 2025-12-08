@@ -90,7 +90,9 @@ router.get('/student/dashboard', authenticate, async (req, res) => {
 router.get('/student/lessons', authenticate, async (req, res) => {
   try {
     const { status, language_id, page = 1, limit = 10 } = req.query;
-    const offset = (page - 1) * limit;
+    const limitNum = parseInt(limit) || 10;
+    const pageNum = parseInt(page) || 1;
+    const offset = (pageNum - 1) * limitNum;
 
     let sql = `
       SELECT lb.*, l.name as language_name,
@@ -110,11 +112,10 @@ router.get('/student/lessons', authenticate, async (req, res) => {
 
     if (language_id) {
       sql += ' AND lb.language_id = ?';
-      params.push(language_id);
+      params.push(parseInt(language_id));
     }
 
-    sql += ' ORDER BY lb.scheduled_date DESC, lb.scheduled_time DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
+    sql += ` ORDER BY lb.scheduled_date DESC, lb.scheduled_time DESC LIMIT ${limitNum} OFFSET ${offset}`;
 
     const lessons = await query(sql, params);
 
@@ -136,10 +137,10 @@ router.get('/student/lessons', authenticate, async (req, res) => {
     res.json({
       lessons,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: pageNum,
+        limit: limitNum,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / limitNum)
       }
     });
   } catch (error) {
