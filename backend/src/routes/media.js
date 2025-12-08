@@ -153,7 +153,7 @@ async function analyzeImageWithAI(imageBase64, mimeType) {
         'X-Title': 'iSPEAK Media Library'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o-mini', // GPT-4o nano/mini for fast image analysis
+        model: 'openai/gpt-5-nano', // GPT-5 nano for fast image analysis
         messages: [
           {
             role: 'user',

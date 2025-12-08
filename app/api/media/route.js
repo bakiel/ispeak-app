@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+// Remove /api suffix if present to avoid double /api/api
+const getApiBase = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+  return base.replace(/\/api\/?$/, '')
+}
 
 export async function GET(request) {
   try {
@@ -16,6 +20,7 @@ export async function GET(request) {
     params.append('limit', limit)
     params.append('offset', offset)
 
+    const API_BASE = getApiBase()
     const response = await fetch(`${API_BASE}/api/media?${params}`, {
       headers: {
         'Content-Type': 'application/json'
