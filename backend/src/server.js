@@ -18,6 +18,7 @@ const lessonRoutes = require('./routes/lessons');
 const contactRoutes = require('./routes/contact');
 const adminRoutes = require('./routes/admin');
 const mediaRoutes = require('./routes/media');
+const contentRoutes = require('./routes/content');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -145,6 +146,7 @@ app.use('/api/lessons', lessonRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/content', contentRoutes);
 
 // Database migration endpoint for media library table
 app.post('/migrate-media', async (req, res) => {
@@ -177,6 +179,59 @@ app.post('/migrate-media', async (req, res) => {
     res.json({ message: 'Media library table created successfully' });
   } catch (error) {
     console.error('Migration error:', error);
+    res.status(500).json({ error: 'Migration failed', details: error.message });
+  }
+});
+
+// Full platform migration endpoint
+app.post('/migrate-platform', async (req, res) => {
+  try {
+    const { query } = require('./config/database');
+    const fs = require('fs');
+    const path = require('path');
+
+    // Read and execute migration file
+    const migrationPath = path.join(__dirname, '../migrations/001_complete_schema.sql');
+
+    if (!fs.existsSync(migrationPath)) {
+      return res.status(404).json({ error: 'Migration file not found' });
+    }
+
+    const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
+
+    // Split by semicolons and execute each statement
+    const statements = migrationSQL
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('SELECT'));
+
+    const results = [];
+    for (const statement of statements) {
+      try {
+        // Skip SET statements and PREPARE/EXECUTE/DEALLOCATE for column checks
+        if (statement.startsWith('SET @') || statement.startsWith('PREPARE') ||
+            statement.startsWith('EXECUTE') || statement.startsWith('DEALLOCATE')) {
+          continue;
+        }
+        await query(statement);
+        results.push({ status: 'success', statement: statement.substring(0, 50) + '...' });
+      } catch (err) {
+        // Continue on duplicate key or table exists errors
+        if (err.code === 'ER_DUP_ENTRY' || err.code === 'ER_TABLE_EXISTS_ERROR') {
+          results.push({ status: 'skipped', statement: statement.substring(0, 50) + '...', reason: err.code });
+        } else {
+          results.push({ status: 'error', statement: statement.substring(0, 50) + '...', error: err.message });
+        }
+      }
+    }
+
+    res.json({
+      message: 'Platform migration completed',
+      results: results.length,
+      details: results
+    });
+  } catch (error) {
+    console.error('Platform migration error:', error);
     res.status(500).json({ error: 'Migration failed', details: error.message });
   }
 });
