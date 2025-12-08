@@ -4,23 +4,34 @@ import { useState, useEffect } from 'react'
 import BlogCard from './BlogCard'
 import Button from '@/components/ui/Button'
 
-export default function BlogList({ initialPosts = [], categories = [] }) {
+// API base URL for direct backend calls
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001/api'
+
+export default function BlogList({ initialPosts = [], categories: initialCategories = [] }) {
   const [posts, setPosts] = useState(initialPosts)
-  const [loading, setLoading] = useState(false)
+  const [categories, setCategories] = useState(initialCategories)
+  const [loading, setLoading] = useState(initialPosts.length === 0)
   const [error, setError] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('all')
 
-  // Filter posts by category
-  const handleCategoryFilter = async (categorySlug) => {
+  // Fetch posts from backend API on mount
+  useEffect(() => {
+    // Only fetch if we don't have initial posts
+    if (initialPosts.length === 0) {
+      fetchPosts()
+      fetchCategories()
+    }
+  }, [])
+
+  const fetchPosts = async (categorySlug = 'all') => {
     setLoading(true)
     setError(null)
-    setSelectedCategory(categorySlug)
 
     try {
-      const url = categorySlug === 'all' 
-        ? '/api/blog'
-        : `/api/blog?category=${categorySlug}`
-      
+      const url = categorySlug === 'all'
+        ? `${API_BASE_URL}/blog`
+        : `${API_BASE_URL}/blog?category=${categorySlug}`
+
       const response = await fetch(url)
       const result = await response.json()
 
@@ -28,13 +39,33 @@ export default function BlogList({ initialPosts = [], categories = [] }) {
         throw new Error(result.error || 'Failed to fetch posts')
       }
 
-      setPosts(result.data || [])
+      // API returns { posts: [...], total, page, totalPages }
+      setPosts(result.posts || result.data || [])
     } catch (err) {
+      console.error('Error fetching posts:', err)
       setError(err.message)
-      console.error('Error filtering posts:', err)
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/blog/categories`)
+      const result = await response.json()
+
+      if (response.ok && Array.isArray(result)) {
+        setCategories(result)
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err)
+    }
+  }
+
+  // Filter posts by category
+  const handleCategoryFilter = async (categorySlug) => {
+    setSelectedCategory(categorySlug)
+    await fetchPosts(categorySlug)
   }
 
   if (error) {
