@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import BlogCard from './BlogCard'
 import Button from '@/components/ui/Button'
 
-// API base URL for direct backend calls
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001/api'
+// Use Next.js API route as proxy to avoid mixed content issues
+// The /api/blog route proxies to the backend over HTTP on the server side
 
 export default function BlogList({ initialPosts = [], categories: initialCategories = [] }) {
   const [posts, setPosts] = useState(initialPosts)
@@ -28,9 +28,10 @@ export default function BlogList({ initialPosts = [], categories: initialCategor
     setError(null)
 
     try {
+      // Use local Next.js API route (proxies to backend)
       const url = categorySlug === 'all'
-        ? `${API_BASE_URL}/blog`
-        : `${API_BASE_URL}/blog?category=${categorySlug}`
+        ? `/api/blog`
+        : `/api/blog?category=${categorySlug}`
 
       const response = await fetch(url)
       const result = await response.json()
@@ -39,8 +40,8 @@ export default function BlogList({ initialPosts = [], categories: initialCategor
         throw new Error(result.error || 'Failed to fetch posts')
       }
 
-      // API returns { posts: [...], total, page, totalPages }
-      setPosts(result.posts || result.data || [])
+      // API returns { success: true, data: [...] } or { posts: [...] }
+      setPosts(result.data || result.posts || [])
     } catch (err) {
       console.error('Error fetching posts:', err)
       setError(err.message)
@@ -51,11 +52,13 @@ export default function BlogList({ initialPosts = [], categories: initialCategor
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/blog/categories`)
+      // Use local Next.js API route
+      const response = await fetch('/api/blog/categories')
       const result = await response.json()
 
-      if (response.ok && Array.isArray(result)) {
-        setCategories(result)
+      if (response.ok) {
+        // Handle different response formats
+        setCategories(result.data || result || [])
       }
     } catch (err) {
       console.error('Error fetching categories:', err)
