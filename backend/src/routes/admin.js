@@ -448,6 +448,55 @@ router.delete('/coupons/:id', async (req, res) => {
   }
 });
 
+// ============ USER MANAGEMENT ============
+
+// Get all users
+router.get('/users', async (req, res) => {
+  try {
+    const { role, search, limit = 50, offset = 0 } = req.query;
+
+    let sql = 'SELECT id, email, first_name, last_name, phone, role, avatar_url, created_at, last_login FROM users WHERE 1=1';
+    const params = [];
+
+    if (role) {
+      sql += ' AND role = ?';
+      params.push(role);
+    }
+
+    if (search) {
+      sql += ' AND (email LIKE ? OR first_name LIKE ? OR last_name LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+    }
+
+    sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params.push(parseInt(limit), parseInt(offset));
+
+    const users = await query(sql, params);
+    res.json(users);
+  } catch (error) {
+    console.error('Users fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// Update user role
+router.put('/users/:id/role', async (req, res) => {
+  try {
+    const { role } = req.body;
+    const validRoles = ['customer', 'student', 'educator', 'parent', 'admin'];
+
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ error: 'Invalid role' });
+    }
+
+    await query('UPDATE users SET role = ? WHERE id = ?', [role, req.params.id]);
+    res.json({ message: 'User role updated' });
+  } catch (error) {
+    console.error('User role update error:', error);
+    res.status(500).json({ error: 'Failed to update user role' });
+  }
+});
+
 // ============ SEED DATA ============
 
 // Seed sample products and blog posts (one-time use)
