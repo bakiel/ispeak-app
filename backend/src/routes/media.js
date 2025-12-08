@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const sharp = require('sharp');
 const { query } = require('../config/database');
 const { authenticate, adminOnly } = require('../middleware/auth');
 
@@ -10,6 +11,100 @@ const router = express.Router();
 
 // OpenRouter API for GPT-4o nano image analysis
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+
+// Max file size after compression (400KB)
+const MAX_FILE_SIZE = 400 * 1024;
+
+// Compress image to be under 400KB
+async function compressImage(inputPath, outputPath, mimeType) {
+  const stats = fs.statSync(inputPath);
+
+  // If already under limit, just copy (for non-compressible formats like SVG)
+  if (stats.size <= MAX_FILE_SIZE || mimeType === 'image/svg+xml') {
+    if (inputPath !== outputPath) {
+      fs.copyFileSync(inputPath, outputPath);
+    }
+    return { size: stats.size, compressed: false };
+  }
+
+  // Calculate target quality based on file size
+  let quality = Math.min(90, Math.floor((MAX_FILE_SIZE / stats.size) * 100));
+  quality = Math.max(20, quality); // Don't go below 20% quality
+
+  try {
+    const image = sharp(inputPath);
+    const metadata = await image.metadata();
+
+    // Resize if image is very large (max 2000px on longest side)
+    let resizeOptions = {};
+    if (metadata.width > 2000 || metadata.height > 2000) {
+      resizeOptions = {
+        width: metadata.width > metadata.height ? 2000 : undefined,
+        height: metadata.height >= metadata.width ? 2000 : undefined,
+        fit: 'inside',
+        withoutEnlargement: true
+      };
+    }
+
+    // Compress based on format
+    let outputBuffer;
+    if (mimeType === 'image/png') {
+      outputBuffer = await image
+        .resize(resizeOptions)
+        .png({ quality, compressionLevel: 9 })
+        .toBuffer();
+    } else if (mimeType === 'image/webp') {
+      outputBuffer = await image
+        .resize(resizeOptions)
+        .webp({ quality })
+        .toBuffer();
+    } else if (mimeType === 'image/gif') {
+      // GIFs - just resize if needed
+      outputBuffer = await image
+        .resize(resizeOptions)
+        .gif()
+        .toBuffer();
+    } else {
+      // Default to JPEG for best compression
+      outputBuffer = await image
+        .resize(resizeOptions)
+        .jpeg({ quality, mozjpeg: true })
+        .toBuffer();
+    }
+
+    // If still too large, reduce quality further
+    if (outputBuffer.length > MAX_FILE_SIZE && quality > 30) {
+      const newQuality = Math.max(20, Math.floor(quality * 0.7));
+      if (mimeType === 'image/png') {
+        outputBuffer = await sharp(inputPath)
+          .resize({ ...resizeOptions, width: resizeOptions.width ? Math.floor(resizeOptions.width * 0.8) : undefined })
+          .png({ quality: newQuality, compressionLevel: 9 })
+          .toBuffer();
+      } else {
+        outputBuffer = await sharp(inputPath)
+          .resize({ ...resizeOptions, width: resizeOptions.width ? Math.floor(resizeOptions.width * 0.8) : undefined })
+          .jpeg({ quality: newQuality, mozjpeg: true })
+          .toBuffer();
+      }
+    }
+
+    fs.writeFileSync(outputPath, outputBuffer);
+
+    return {
+      size: outputBuffer.length,
+      compressed: true,
+      width: metadata.width,
+      height: metadata.height
+    };
+  } catch (error) {
+    console.error('Compression error:', error);
+    // If compression fails, just use original
+    if (inputPath !== outputPath) {
+      fs.copyFileSync(inputPath, outputPath);
+    }
+    return { size: stats.size, compressed: false };
+  }
+}
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -190,10 +285,15 @@ router.post('/upload', authenticate, adminOnly, upload.single('file'), async (re
     }
 
     const file = req.file;
-    const filePath = file.path;
+    const originalPath = file.path;
+
+    // Compress image to under 400KB
+    const compressionResult = await compressImage(originalPath, originalPath, file.mimetype);
+
+    const filePath = originalPath;
     const fileUrl = `/uploads/${file.filename}`;
 
-    // Read file for AI analysis
+    // Read compressed file for AI analysis
     let aiAnalysis = { title: null, alt: null, description: null };
 
     if (OPENROUTER_API_KEY && file.mimetype.startsWith('image/')) {
@@ -209,11 +309,21 @@ router.post('/upload', authenticate, adminOnly, upload.single('file'), async (re
                     .replace(/\s+/g, ' ')
                     .trim();
 
-    // Get image dimensions (basic - could use sharp for better handling)
-    let width = null;
-    let height = null;
+    // Get image dimensions from compression result or sharp
+    let width = compressionResult.width || null;
+    let height = compressionResult.height || null;
 
-    // Insert into database
+    if (!width || !height) {
+      try {
+        const metadata = await sharp(filePath).metadata();
+        width = metadata.width;
+        height = metadata.height;
+      } catch (e) {
+        // Ignore dimension errors
+      }
+    }
+
+    // Insert into database with compressed file size
     const result = await query(`
       INSERT INTO media_library (
         filename, original_name, file_path, url, mime_type, file_size,
@@ -225,7 +335,7 @@ router.post('/upload', authenticate, adminOnly, upload.single('file'), async (re
       filePath,
       fileUrl,
       file.mimetype,
-      file.size,
+      compressionResult.size,
       width,
       height,
       aiAnalysis.alt || title,
@@ -240,7 +350,10 @@ router.post('/upload', authenticate, adminOnly, upload.single('file'), async (re
     res.status(201).json({
       message: 'File uploaded successfully',
       media: media[0],
-      aiAnalysis: aiAnalysis.title ? true : false
+      aiAnalysis: aiAnalysis.title ? true : false,
+      compressed: compressionResult.compressed,
+      originalSize: file.size,
+      finalSize: compressionResult.size
     });
   } catch (error) {
     console.error('Upload error:', error);
@@ -269,6 +382,7 @@ router.post('/upload-url', authenticate, adminOnly, async (req, res) => {
     }
 
     const buffer = Buffer.from(await response.arrayBuffer());
+    const originalSize = buffer.length;
     const ext = contentType.split('/')[1].split(';')[0] || 'jpg';
     const uniqueId = crypto.randomBytes(8).toString('hex');
     const filename = `${Date.now()}-${uniqueId}.${ext}`;
@@ -281,29 +395,49 @@ router.post('/upload-url', authenticate, adminOnly, async (req, res) => {
     const filePath = path.join(uploadDir, filename);
     fs.writeFileSync(filePath, buffer);
 
-    // AI analysis
+    // Compress image to under 400KB
+    const compressionResult = await compressImage(filePath, filePath, contentType);
+
+    // Read compressed file for AI analysis
     let aiAnalysis = { title: null, alt: null, description: null };
     if (OPENROUTER_API_KEY) {
-      const imageBase64 = buffer.toString('base64');
+      const compressedBuffer = fs.readFileSync(filePath);
+      const imageBase64 = compressedBuffer.toString('base64');
       aiAnalysis = await analyzeImageWithAI(imageBase64, contentType);
     }
 
     const title = aiAnalysis.title || 'imported-image';
     const fileUrl = `/uploads/${filename}`;
 
-    // Insert into database
+    // Get dimensions
+    let width = compressionResult.width || null;
+    let height = compressionResult.height || null;
+
+    if (!width || !height) {
+      try {
+        const metadata = await sharp(filePath).metadata();
+        width = metadata.width;
+        height = metadata.height;
+      } catch (e) {
+        // Ignore dimension errors
+      }
+    }
+
+    // Insert into database with compressed file size
     const result = await query(`
       INSERT INTO media_library (
         filename, original_name, file_path, url, mime_type, file_size,
-        alt_text, title, description, folder
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        width, height, alt_text, title, description, folder
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       filename,
       url.split('/').pop() || filename,
       filePath,
       fileUrl,
       contentType,
-      buffer.length,
+      compressionResult.size,
+      width,
+      height,
       aiAnalysis.alt || title,
       title,
       aiAnalysis.description || null,
@@ -315,7 +449,10 @@ router.post('/upload-url', authenticate, adminOnly, async (req, res) => {
     res.status(201).json({
       message: 'Image imported successfully',
       media: media[0],
-      aiAnalysis: aiAnalysis.title ? true : false
+      aiAnalysis: aiAnalysis.title ? true : false,
+      compressed: compressionResult.compressed,
+      originalSize: originalSize,
+      finalSize: compressionResult.size
     });
   } catch (error) {
     console.error('URL upload error:', error);
