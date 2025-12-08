@@ -40,7 +40,7 @@ export default function PortalLayout({ children, portalType = 'student' }) {
 
       // Verify role matches portal
       const allowedRoles = {
-        student: ['student', 'admin'],
+        student: ['student', 'customer', 'admin'],
         educator: ['educator', 'admin'],
         parent: ['parent', 'admin']
       }
