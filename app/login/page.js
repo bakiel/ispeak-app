@@ -40,18 +40,22 @@ export default function LoginPage() {
 
       // Redirect based on role
       const role = data.user.role
+      let redirectPath = '/portal/student'
+
       if (role === 'admin') {
-        router.push('/admin')
+        redirectPath = '/admin'
       } else if (role === 'educator') {
-        router.push('/portal/educator')
+        redirectPath = '/portal/educator'
       } else if (role === 'parent') {
-        router.push('/portal/parent')
-      } else {
-        router.push('/portal/student')
+        redirectPath = '/portal/parent'
+      } else if (role === 'student' || role === 'customer') {
+        redirectPath = '/portal/student'
       }
+
+      // Use window.location for reliable redirect
+      window.location.href = redirectPath
     } catch (err) {
       setError(err.message || 'Invalid email or password. Please try again.')
-    } finally {
       setLoading(false)
     }
   }
