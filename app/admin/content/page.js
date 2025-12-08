@@ -7,25 +7,18 @@ import Link from 'next/link'
 export default function ContentManagementPage() {
   const contentSections = [
     {
-      title: 'Hero Sections',
-      description: 'Manage hero banners for different pages',
-      icon: 'fas fa-image',
-      href: '/admin/content/hero-sections',
-      color: 'bg-blue-500'
+      title: 'Languages',
+      description: 'Manage available languages (Yoruba, Kiswahili, Twi, Amharic)',
+      icon: 'fas fa-globe-africa',
+      href: '/admin/content/languages',
+      color: 'bg-emerald-500'
     },
     {
-      title: 'Statistics',
-      description: 'Update homepage statistics and metrics',
-      icon: 'fas fa-chart-bar',
-      href: '/admin/content/statistics',
-      color: 'bg-green-500'
-    },
-    {
-      title: 'Feature Cards',
-      description: 'Manage feature cards and value propositions',
-      icon: 'fas fa-th-large',
-      href: '/admin/content/feature-cards',
-      color: 'bg-purple-500'
+      title: 'Pricing Plans',
+      description: 'Update pricing and subscription plans',
+      icon: 'fas fa-dollar-sign',
+      href: '/admin/content/pricing',
+      color: 'bg-teal-500'
     },
     {
       title: 'Testimonials',
@@ -42,32 +35,32 @@ export default function ContentManagementPage() {
       color: 'bg-red-500'
     },
     {
-      title: 'Programs',
-      description: 'Manage language learning programs',
-      icon: 'fas fa-graduation-cap',
-      href: '/admin/content/programs',
-      color: 'bg-indigo-500'
-    },
-    {
-      title: 'Educators',
-      description: 'Manage educator profiles and information',
+      title: 'Team Members',
+      description: 'Manage educator and staff profiles',
       icon: 'fas fa-chalkboard-teacher',
-      href: '/admin/content/educators',
+      href: '/admin/content/team',
       color: 'bg-pink-500'
     },
     {
-      title: 'Pricing Plans',
-      description: 'Update pricing and subscription plans',
-      icon: 'fas fa-dollar-sign',
-      href: '/admin/content/pricing',
-      color: 'bg-teal-500'
+      title: 'Hero Sections',
+      description: 'Manage hero banners for different pages',
+      icon: 'fas fa-image',
+      href: '/admin/content/hero-sections',
+      color: 'bg-blue-500'
     },
     {
-      title: 'Page Sections',
-      description: 'Manage content for various page sections',
-      icon: 'fas fa-file-alt',
-      href: '/admin/content/page-sections',
-      color: 'bg-orange-500'
+      title: 'Statistics',
+      description: 'Update homepage statistics and metrics',
+      icon: 'fas fa-chart-bar',
+      href: '/admin/content/statistics',
+      color: 'bg-green-500'
+    },
+    {
+      title: 'Content Blocks',
+      description: 'Manage page content blocks and sections',
+      icon: 'fas fa-th-large',
+      href: '/admin/content/blocks',
+      color: 'bg-purple-500'
     }
   ]
 
