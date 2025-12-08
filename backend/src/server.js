@@ -94,6 +94,40 @@ app.post('/seed-data', async (req, res) => {
   }
 });
 
+// Add more blog posts endpoint
+app.post('/seed-blogs', async (req, res) => {
+  try {
+    const { query } = require('./config/database');
+    const { blogs } = req.body;
+
+    if (!blogs || !Array.isArray(blogs)) {
+      return res.status(400).json({ error: 'blogs array required' });
+    }
+
+    const inserted = [];
+    for (const blog of blogs) {
+      // Check if slug exists
+      const existing = await query('SELECT id FROM blog_posts WHERE slug = ?', [blog.slug]);
+      if (existing.length > 0) {
+        inserted.push({ slug: blog.slug, status: 'exists', id: existing[0].id });
+        continue;
+      }
+
+      const result = await query(`
+        INSERT INTO blog_posts (title, slug, excerpt, content, featured_image, category_id, author_name, is_published, published_at, views)
+        VALUES (?, ?, ?, ?, ?, ?, ?, TRUE, NOW(), 0)
+      `, [blog.title, blog.slug, blog.excerpt, blog.content, blog.featured_image, blog.category_id || 1, blog.author_name || 'iSPEAK Team']);
+
+      inserted.push({ slug: blog.slug, status: 'created', id: result.insertId });
+    }
+
+    res.json({ message: 'Blogs processed', results: inserted });
+  } catch (error) {
+    console.error('Seed blogs error:', error);
+    res.status(500).json({ error: 'Failed to seed blogs', details: error.message });
+  }
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
