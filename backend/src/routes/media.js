@@ -587,4 +587,118 @@ router.get('/file/:filename', (req, res) => {
   res.sendFile(filePath);
 });
 
+// Scan and import existing uploads into media library - Admin only
+router.post('/scan-imports', authenticate, adminOnly, async (req, res) => {
+  try {
+    const uploadDir = path.join(__dirname, '../../uploads');
+
+    if (!fs.existsSync(uploadDir)) {
+      return res.json({ message: 'No uploads folder found', imported: 0 });
+    }
+
+    const files = fs.readdirSync(uploadDir);
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+    let imported = 0;
+    let skipped = 0;
+    const results = [];
+
+    for (const filename of files) {
+      const ext = path.extname(filename).toLowerCase();
+      if (!imageExtensions.includes(ext)) {
+        continue;
+      }
+
+      // Check if already in database
+      const existing = await query('SELECT id FROM media_library WHERE filename = ?', [filename]);
+      if (existing.length > 0) {
+        skipped++;
+        continue;
+      }
+
+      const filePath = path.join(uploadDir, filename);
+      const stats = fs.statSync(filePath);
+      const fileUrl = `/uploads/${filename}`;
+
+      // Determine mime type
+      const mimeTypes = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp',
+        '.svg': 'image/svg+xml'
+      };
+      const mimeType = mimeTypes[ext] || 'image/jpeg';
+
+      // Get dimensions if possible
+      let width = null;
+      let height = null;
+      try {
+        const metadata = await sharp(filePath).metadata();
+        width = metadata.width;
+        height = metadata.height;
+      } catch (e) {
+        // Ignore dimension errors (e.g., for SVGs)
+      }
+
+      // Generate title from filename
+      const title = path.basename(filename, ext)
+        .replace(/[_-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .replace(/^\d+\s*/, '') // Remove leading numbers/timestamps
+        .trim() || filename;
+
+      // Run AI analysis if API key available
+      let aiAnalysis = { title: null, alt: null, description: null };
+      if (OPENROUTER_API_KEY && mimeType.startsWith('image/') && mimeType !== 'image/svg+xml') {
+        try {
+          const imageBuffer = fs.readFileSync(filePath);
+          const imageBase64 = imageBuffer.toString('base64');
+          aiAnalysis = await analyzeImageWithAI(imageBase64, mimeType);
+        } catch (e) {
+          console.log('AI analysis skipped for:', filename);
+        }
+      }
+
+      // Insert into database
+      const result = await query(`
+        INSERT INTO media_library (
+          filename, original_name, file_path, url, mime_type, file_size,
+          width, height, alt_text, title, description, folder
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        filename,
+        filename,
+        filePath,
+        fileUrl,
+        mimeType,
+        stats.size,
+        width,
+        height,
+        aiAnalysis.alt || title,
+        aiAnalysis.title || title,
+        aiAnalysis.description || null,
+        'uploads'
+      ]);
+
+      imported++;
+      results.push({
+        filename,
+        id: result.insertId,
+        aiAnalyzed: !!aiAnalysis.title
+      });
+    }
+
+    res.json({
+      message: `Imported ${imported} files, skipped ${skipped} (already in library)`,
+      imported,
+      skipped,
+      results
+    });
+  } catch (error) {
+    console.error('Scan imports error:', error);
+    res.status(500).json({ error: 'Failed to scan imports', details: error.message });
+  }
+});
+
 module.exports = router;
