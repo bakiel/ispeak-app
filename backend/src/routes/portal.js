@@ -497,10 +497,13 @@ router.post('/parent/children', authenticate, requireRole('parent', 'admin'), as
     const tempPassword = Math.random().toString(36).slice(-8);
     const hash = await bcrypt.hash(tempPassword, 10);
 
+    // Generate unique email if not provided
+    const childEmail = email || `child_${Date.now()}_${Math.random().toString(36).slice(-4)}@child.ispeak.local`;
+
     const result = await query(`
       INSERT INTO users (first_name, last_name, email, password_hash, role)
       VALUES (?, ?, ?, ?, 'student')
-    `, [first_name, last_name, email || null, hash]);
+    `, [first_name, last_name, childEmail, hash]);
 
     const childId = result.insertId;
 
