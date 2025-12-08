@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+const path = require('path');
 const db = require('./config/database');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
@@ -16,6 +17,7 @@ const userRoutes = require('./routes/users');
 const lessonRoutes = require('./routes/lessons');
 const contactRoutes = require('./routes/contact');
 const adminRoutes = require('./routes/admin');
+const mediaRoutes = require('./routes/media');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -128,6 +130,9 @@ app.post('/seed-blogs', async (req, res) => {
   }
 });
 
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -139,6 +144,42 @@ app.use('/api/users', userRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/media', mediaRoutes);
+
+// Database migration endpoint for media library table
+app.post('/migrate-media', async (req, res) => {
+  try {
+    const { query } = require('./config/database');
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS media_library (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        filename VARCHAR(255) NOT NULL,
+        original_name VARCHAR(255),
+        file_path VARCHAR(500),
+        url VARCHAR(500) NOT NULL,
+        mime_type VARCHAR(100),
+        file_size INT,
+        width INT,
+        height INT,
+        alt_text VARCHAR(255),
+        title VARCHAR(255),
+        description TEXT,
+        folder VARCHAR(100) DEFAULT 'uploads',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_folder (folder),
+        INDEX idx_mime_type (mime_type),
+        INDEX idx_created_at (created_at)
+      )
+    `);
+
+    res.json({ message: 'Media library table created successfully' });
+  } catch (error) {
+    console.error('Migration error:', error);
+    res.status(500).json({ error: 'Migration failed', details: error.message });
+  }
+});
 
 // 404 handler
 app.use((req, res) => {
