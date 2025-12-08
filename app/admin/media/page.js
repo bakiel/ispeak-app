@@ -5,12 +5,8 @@ import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 
-// Backend base URL for image display (strip /api suffix if present)
-const getBackendBase = () => {
-  const base = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
-  return base.replace(/\/api\/?$/, '')
-}
-const BACKEND_BASE = getBackendBase()
+// Use local image proxy to avoid mixed content issues (HTTPS -> HTTP)
+// Images are served via /api/media/image/uploads/filename.png
 
 export default function MediaLibrary() {
   const [media, setMedia] = useState([])
@@ -210,8 +206,11 @@ export default function MediaLibrary() {
   }
 
   const getImageUrl = (item) => {
+    // If it's already an absolute URL, use it
     if (item.url?.startsWith('http')) return item.url
-    return `${BACKEND_BASE}${item.url}`
+    // Use local proxy to avoid mixed content (HTTPS frontend -> HTTP backend)
+    // Convert /uploads/file.png to /api/media/image/uploads/file.png
+    return `/api/media/image${item.url}`
   }
 
   return (
