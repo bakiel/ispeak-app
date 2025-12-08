@@ -183,52 +183,387 @@ app.post('/migrate-media', async (req, res) => {
   }
 });
 
-// Full platform migration endpoint
+// Full platform migration endpoint (inline SQL for container compatibility)
 app.post('/migrate-platform', async (req, res) => {
   try {
     const { query } = require('./config/database');
-    const fs = require('fs');
-    const path = require('path');
+    const results = [];
 
-    // Read and execute migration file
-    const migrationPath = path.join(__dirname, '../migrations/001_complete_schema.sql');
-
-    if (!fs.existsSync(migrationPath)) {
-      return res.status(404).json({ error: 'Migration file not found' });
+    // Create languages table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS languages (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          native_name VARCHAR(100),
+          slug VARCHAR(50) UNIQUE NOT NULL,
+          description TEXT,
+          flag_icon VARCHAR(255),
+          region VARCHAR(100),
+          is_active BOOLEAN DEFAULT TRUE,
+          display_order INT DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+      `);
+      results.push({ table: 'languages', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'languages', status: 'exists or error', error: err.message });
     }
 
-    const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
+    // Create pricing_plans table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS pricing_plans (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          slug VARCHAR(50) UNIQUE NOT NULL,
+          description TEXT,
+          price DECIMAL(10,2) NOT NULL,
+          currency VARCHAR(3) DEFAULT 'USD',
+          billing_period ENUM('monthly', 'quarterly', 'yearly', 'one-time') DEFAULT 'monthly',
+          features JSON,
+          is_popular BOOLEAN DEFAULT FALSE,
+          is_active BOOLEAN DEFAULT TRUE,
+          display_order INT DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+      `);
+      results.push({ table: 'pricing_plans', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'pricing_plans', status: 'exists or error', error: err.message });
+    }
 
-    // Split by semicolons and execute each statement
-    const statements = migrationSQL
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('SELECT'));
+    // Create faqs table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS faqs (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          question TEXT NOT NULL,
+          answer TEXT NOT NULL,
+          category VARCHAR(100),
+          display_order INT DEFAULT 0,
+          is_active BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+      `);
+      results.push({ table: 'faqs', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'faqs', status: 'exists or error', error: err.message });
+    }
 
-    const results = [];
-    for (const statement of statements) {
-      try {
-        // Skip SET statements and PREPARE/EXECUTE/DEALLOCATE for column checks
-        if (statement.startsWith('SET @') || statement.startsWith('PREPARE') ||
-            statement.startsWith('EXECUTE') || statement.startsWith('DEALLOCATE')) {
-          continue;
-        }
-        await query(statement);
-        results.push({ status: 'success', statement: statement.substring(0, 50) + '...' });
-      } catch (err) {
-        // Continue on duplicate key or table exists errors
-        if (err.code === 'ER_DUP_ENTRY' || err.code === 'ER_TABLE_EXISTS_ERROR') {
-          results.push({ status: 'skipped', statement: statement.substring(0, 50) + '...', reason: err.code });
-        } else {
-          results.push({ status: 'error', statement: statement.substring(0, 50) + '...', error: err.message });
-        }
+    // Create testimonials table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS testimonials (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          role VARCHAR(100),
+          location VARCHAR(100),
+          content TEXT NOT NULL,
+          rating INT DEFAULT 5,
+          avatar_url VARCHAR(255),
+          language_id INT,
+          is_featured BOOLEAN DEFAULT FALSE,
+          is_active BOOLEAN DEFAULT TRUE,
+          display_order INT DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+      `);
+      results.push({ table: 'testimonials', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'testimonials', status: 'exists or error', error: err.message });
+    }
+
+    // Create team_members table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS team_members (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          role VARCHAR(100) NOT NULL,
+          bio TEXT,
+          photo_url VARCHAR(255),
+          languages JSON,
+          specializations JSON,
+          email VARCHAR(255),
+          is_featured BOOLEAN DEFAULT FALSE,
+          is_active BOOLEAN DEFAULT TRUE,
+          display_order INT DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+      `);
+      results.push({ table: 'team_members', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'team_members', status: 'exists or error', error: err.message });
+    }
+
+    // Create content_blocks table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS content_blocks (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          page VARCHAR(100) NOT NULL,
+          section VARCHAR(100) NOT NULL,
+          block_key VARCHAR(100) NOT NULL,
+          content_type ENUM('text', 'html', 'image', 'json') DEFAULT 'text',
+          content TEXT,
+          metadata JSON,
+          is_active BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_block (page, section, block_key)
+        )
+      `);
+      results.push({ table: 'content_blocks', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'content_blocks', status: 'exists or error', error: err.message });
+    }
+
+    // Create student_progress table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS student_progress (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          user_id INT NOT NULL,
+          language_id INT NOT NULL,
+          current_level ENUM('beginner', 'elementary', 'intermediate', 'advanced') DEFAULT 'beginner',
+          total_lessons_completed INT DEFAULT 0,
+          total_practice_minutes INT DEFAULT 0,
+          vocabulary_learned INT DEFAULT 0,
+          current_streak_days INT DEFAULT 0,
+          longest_streak_days INT DEFAULT 0,
+          last_activity_date DATE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_user_language (user_id, language_id)
+        )
+      `);
+      results.push({ table: 'student_progress', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'student_progress', status: 'exists or error', error: err.message });
+    }
+
+    // Create achievements table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS achievements (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          description TEXT,
+          icon VARCHAR(100),
+          category VARCHAR(50),
+          points INT DEFAULT 0,
+          criteria JSON,
+          is_active BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      results.push({ table: 'achievements', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'achievements', status: 'exists or error', error: err.message });
+    }
+
+    // Create user_achievements table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS user_achievements (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          user_id INT NOT NULL,
+          achievement_id INT NOT NULL,
+          earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_user_achievement (user_id, achievement_id)
+        )
+      `);
+      results.push({ table: 'user_achievements', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'user_achievements', status: 'exists or error', error: err.message });
+    }
+
+    // Create learning_modules table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS learning_modules (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          language_id INT NOT NULL,
+          name VARCHAR(255) NOT NULL,
+          slug VARCHAR(100) NOT NULL,
+          description TEXT,
+          level ENUM('beginner', 'elementary', 'intermediate', 'advanced') DEFAULT 'beginner',
+          module_order INT DEFAULT 0,
+          estimated_hours DECIMAL(4,1),
+          icon VARCHAR(100),
+          is_published BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_language_module (language_id, slug)
+        )
+      `);
+      results.push({ table: 'learning_modules', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'learning_modules', status: 'exists or error', error: err.message });
+    }
+
+    // Create learning_lessons table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS learning_lessons (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          module_id INT NOT NULL,
+          title VARCHAR(255) NOT NULL,
+          slug VARCHAR(100) NOT NULL,
+          description TEXT,
+          content JSON,
+          lesson_order INT DEFAULT 0,
+          duration_minutes INT DEFAULT 30,
+          lesson_type ENUM('video', 'interactive', 'reading', 'practice', 'quiz') DEFAULT 'interactive',
+          is_published BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_module_lesson (module_id, slug)
+        )
+      `);
+      results.push({ table: 'learning_lessons', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'learning_lessons', status: 'exists or error', error: err.message });
+    }
+
+    // Create user_lesson_progress table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS user_lesson_progress (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          user_id INT NOT NULL,
+          lesson_id INT NOT NULL,
+          status ENUM('not_started', 'in_progress', 'completed') DEFAULT 'not_started',
+          score DECIMAL(5,2),
+          time_spent_minutes INT DEFAULT 0,
+          completed_at TIMESTAMP NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_user_lesson (user_id, lesson_id)
+        )
+      `);
+      results.push({ table: 'user_lesson_progress', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'user_lesson_progress', status: 'exists or error', error: err.message });
+    }
+
+    // Create notifications table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS notifications (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          user_id INT NOT NULL,
+          title VARCHAR(255) NOT NULL,
+          message TEXT,
+          type ENUM('info', 'success', 'warning', 'reminder', 'achievement') DEFAULT 'info',
+          is_read BOOLEAN DEFAULT FALSE,
+          action_url VARCHAR(255),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      results.push({ table: 'notifications', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'notifications', status: 'exists or error', error: err.message });
+    }
+
+    // Create messages table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS messages (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          sender_id INT NOT NULL,
+          recipient_id INT NOT NULL,
+          subject VARCHAR(255),
+          content TEXT NOT NULL,
+          is_read BOOLEAN DEFAULT FALSE,
+          parent_message_id INT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      results.push({ table: 'messages', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'messages', status: 'exists or error', error: err.message });
+    }
+
+    // Now seed initial data
+    // Seed languages
+    try {
+      const existingLangs = await query('SELECT COUNT(*) as count FROM languages');
+      if (existingLangs[0].count === 0) {
+        await query(`
+          INSERT INTO languages (name, native_name, slug, description, region, display_order) VALUES
+          ('Yoruba', 'Èdè Yorùbá', 'yoruba', 'A language spoken by the Yoruba people in West Africa, primarily in Nigeria and Benin.', 'West Africa', 1),
+          ('Kiswahili', 'Kiswahili', 'kiswahili', 'A Bantu language widely spoken in East Africa, the lingua franca of the region.', 'East Africa', 2),
+          ('Twi', 'Twi', 'twi', 'An Akan language spoken in Ghana, part of the Kwa language family.', 'West Africa', 3),
+          ('Amharic', 'አማርኛ', 'amharic', 'The official language of Ethiopia, a Semitic language with its own unique script.', 'East Africa', 4)
+        `);
+        results.push({ seed: 'languages', status: 'seeded', count: 4 });
       }
+    } catch (err) {
+      results.push({ seed: 'languages', status: 'error', error: err.message });
+    }
+
+    // Seed pricing plans
+    try {
+      const existingPlans = await query('SELECT COUNT(*) as count FROM pricing_plans');
+      if (existingPlans[0].count === 0) {
+        await query(`
+          INSERT INTO pricing_plans (name, slug, description, price, billing_period, features, is_popular, display_order) VALUES
+          ('Explorer', 'explorer', 'Perfect for trying out language learning', 49.00, 'monthly', '["2 live lessons per month", "Basic vocabulary access", "Email support", "Progress tracking"]', FALSE, 1),
+          ('Adventurer', 'adventurer', 'Most popular choice for serious learners', 99.00, 'monthly', '["4 live lessons per month", "Full curriculum access", "Priority scheduling", "Progress reports", "Parent dashboard", "Chat support"]', TRUE, 2),
+          ('Champion', 'champion', 'Intensive learning for fast progress', 179.00, 'monthly', '["8 live lessons per month", "Full curriculum access", "Flexible scheduling", "Detailed analytics", "Parent dashboard", "Priority support", "Cultural immersion sessions"]', FALSE, 3)
+        `);
+        results.push({ seed: 'pricing_plans', status: 'seeded', count: 3 });
+      }
+    } catch (err) {
+      results.push({ seed: 'pricing_plans', status: 'error', error: err.message });
+    }
+
+    // Seed FAQs
+    try {
+      const existingFaqs = await query('SELECT COUNT(*) as count FROM faqs');
+      if (existingFaqs[0].count === 0) {
+        await query(`
+          INSERT INTO faqs (question, answer, category, display_order) VALUES
+          ('What age groups do you teach?', 'We offer specialized programs for children ages 3-14, with age-appropriate curriculum and teaching methods for each group.', 'General', 1),
+          ('How do the online lessons work?', 'Lessons are conducted via secure video conferencing with native-speaking educators. Each session is interactive and engaging.', 'Lessons', 2),
+          ('What languages do you offer?', 'We currently offer Yoruba, Kiswahili, Twi, and Amharic, with plans to add more African languages.', 'Languages', 3),
+          ('Can parents monitor progress?', 'Yes! Parents have access to a dedicated dashboard showing lesson history, progress reports, and upcoming sessions.', 'Parents', 4),
+          ('What if we need to reschedule?', 'You can reschedule lessons up to 24 hours in advance through your dashboard at no additional cost.', 'Scheduling', 5),
+          ('Do you offer trial lessons?', 'Yes, we offer a free trial lesson so you can experience our teaching approach before committing.', 'General', 6)
+        `);
+        results.push({ seed: 'faqs', status: 'seeded', count: 6 });
+      }
+    } catch (err) {
+      results.push({ seed: 'faqs', status: 'error', error: err.message });
+    }
+
+    // Seed testimonials
+    try {
+      const existingTest = await query('SELECT COUNT(*) as count FROM testimonials');
+      if (existingTest[0].count === 0) {
+        await query(`
+          INSERT INTO testimonials (name, role, location, content, rating, is_featured, display_order) VALUES
+          ('Sarah Johnson', 'Parent', 'Atlanta, GA', 'My daughter has been learning Yoruba for 6 months and the progress is amazing. The teachers are so patient and make learning fun!', 5, TRUE, 1),
+          ('Michael Okonkwo', 'Parent', 'Houston, TX', 'As a Nigerian-American, it was important for my kids to connect with their heritage. iSPEAK made it possible and enjoyable.', 5, TRUE, 2),
+          ('Jennifer Williams', 'Parent', 'New York, NY', 'The flexibility of scheduling and quality of instruction exceeded our expectations. Highly recommend!', 5, TRUE, 3),
+          ('David Mensah', 'Parent', 'Chicago, IL', 'My son loves his Twi lessons. The cultural elements incorporated into teaching make it so much more meaningful.', 5, FALSE, 4)
+        `);
+        results.push({ seed: 'testimonials', status: 'seeded', count: 4 });
+      }
+    } catch (err) {
+      results.push({ seed: 'testimonials', status: 'error', error: err.message });
     }
 
     res.json({
-      message: 'Platform migration completed',
-      results: results.length,
-      details: results
+      message: 'Platform migration completed successfully',
+      results: results
     });
   } catch (error) {
     console.error('Platform migration error:', error);
