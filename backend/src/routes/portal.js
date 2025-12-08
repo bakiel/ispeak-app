@@ -464,6 +464,337 @@ router.post('/parent/link-child', authenticate, requireRole('parent', 'admin'), 
   }
 });
 
+// Get parent's children list
+router.get('/parent/children', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const children = await query(`
+      SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.date_of_birth, u.created_at,
+             (SELECT l.name FROM languages l
+              JOIN student_progress sp ON l.id = sp.language_id
+              WHERE sp.user_id = u.id
+              ORDER BY sp.updated_at DESC LIMIT 1) as current_language,
+             (SELECT sp.current_level FROM student_progress sp WHERE sp.user_id = u.id ORDER BY sp.updated_at DESC LIMIT 1) as current_level
+      FROM users u
+      JOIN parent_child_links pcl ON u.id = pcl.child_id
+      WHERE pcl.parent_id = ?
+      ORDER BY u.first_name ASC
+    `, [req.user.id]);
+
+    res.json({ children });
+  } catch (error) {
+    console.error('Get children error:', error);
+    res.status(500).json({ error: 'Failed to fetch children' });
+  }
+});
+
+// Add a new child
+router.post('/parent/children', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { first_name, last_name, email, date_of_birth, language_id } = req.body;
+
+    // Create student account for child
+    const bcrypt = require('bcryptjs');
+    const tempPassword = Math.random().toString(36).slice(-8);
+    const hash = await bcrypt.hash(tempPassword, 10);
+
+    const result = await query(`
+      INSERT INTO users (first_name, last_name, email, password_hash, role, date_of_birth)
+      VALUES (?, ?, ?, ?, 'student', ?)
+    `, [first_name, last_name, email || null, hash, date_of_birth || null]);
+
+    const childId = result.insertId;
+
+    // Link to parent
+    await query('INSERT INTO parent_child_links (parent_id, child_id) VALUES (?, ?)', [req.user.id, childId]);
+
+    // Set up initial language progress if specified
+    if (language_id) {
+      await query(`
+        INSERT INTO student_progress (user_id, language_id, current_level, lessons_completed, total_practice_time)
+        VALUES (?, ?, 'beginner', 0, 0)
+      `, [childId, language_id]);
+    }
+
+    res.status(201).json({
+      message: 'Child added successfully',
+      childId,
+      tempPassword: email ? tempPassword : null
+    });
+  } catch (error) {
+    console.error('Add child error:', error);
+    res.status(500).json({ error: 'Failed to add child' });
+  }
+});
+
+// Update child info
+router.put('/parent/children/:childId', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { childId } = req.params;
+    const { first_name, last_name, date_of_birth, language_id } = req.body;
+
+    // Verify parent owns this child
+    const link = await query(
+      'SELECT id FROM parent_child_links WHERE parent_id = ? AND child_id = ?',
+      [req.user.id, childId]
+    );
+
+    if (link.length === 0) {
+      return res.status(403).json({ error: 'Not authorized to update this child' });
+    }
+
+    await query(`
+      UPDATE users SET first_name = ?, last_name = ?, date_of_birth = ?
+      WHERE id = ?
+    `, [first_name, last_name, date_of_birth || null, childId]);
+
+    res.json({ message: 'Child updated successfully' });
+  } catch (error) {
+    console.error('Update child error:', error);
+    res.status(500).json({ error: 'Failed to update child' });
+  }
+});
+
+// Remove child link
+router.delete('/parent/children/:childId', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { childId } = req.params;
+
+    await query(
+      'DELETE FROM parent_child_links WHERE parent_id = ? AND child_id = ?',
+      [req.user.id, childId]
+    );
+
+    res.json({ message: 'Child unlinked successfully' });
+  } catch (error) {
+    console.error('Unlink child error:', error);
+    res.status(500).json({ error: 'Failed to unlink child' });
+  }
+});
+
+// Get child progress
+router.get('/parent/children/:childId/progress', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { childId } = req.params;
+
+    // Verify parent owns this child
+    const link = await query(
+      'SELECT id FROM parent_child_links WHERE parent_id = ? AND child_id = ?',
+      [req.user.id, childId]
+    );
+
+    if (link.length === 0) {
+      return res.status(403).json({ error: 'Not authorized to view this child' });
+    }
+
+    // Get progress data
+    const progressData = await query(`
+      SELECT sp.*, l.name as language_name
+      FROM student_progress sp
+      JOIN languages l ON sp.language_id = l.id
+      WHERE sp.user_id = ?
+    `, [childId]);
+
+    // Get lesson stats
+    const lessonStats = await query(`
+      SELECT
+        COUNT(*) as total_lessons,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_lessons,
+        SUM(CASE WHEN status = 'completed' THEN duration_minutes ELSE 0 END) as total_practice_minutes
+      FROM lesson_bookings
+      WHERE student_id = ?
+    `, [childId]);
+
+    // Get achievements
+    const achievements = await query(`
+      SELECT a.name, a.description, a.icon, ua.earned_at
+      FROM user_achievements ua
+      JOIN achievements a ON ua.achievement_id = a.id
+      WHERE ua.user_id = ?
+      ORDER BY ua.earned_at DESC
+    `, [childId]);
+
+    // Get weekly activity
+    const weeklyActivity = await query(`
+      SELECT DAYOFWEEK(scheduled_date) as day, COUNT(*) as count
+      FROM lesson_bookings
+      WHERE student_id = ?
+        AND scheduled_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        AND status = 'completed'
+      GROUP BY DAYOFWEEK(scheduled_date)
+    `, [childId]);
+
+    const stats = lessonStats[0] || {};
+    const progress = progressData[0] || {};
+
+    res.json({
+      overallProgress: progress.lessons_completed ? Math.min(100, Math.round((progress.lessons_completed / 50) * 100)) : 0,
+      lessonsCompleted: stats.completed_lessons || 0,
+      practiceHours: Math.round((stats.total_practice_minutes || 0) / 60),
+      vocabularyLearned: progress.vocabulary_count || 0,
+      currentStreak: progress.streak_days || 0,
+      skills: {
+        speaking: progress.speaking_score || 0,
+        listening: progress.listening_score || 0,
+        reading: progress.reading_score || 0,
+        writing: progress.writing_score || 0
+      },
+      recentAchievements: achievements,
+      weeklyActivity: [0, 0, 0, 0, 0, 0, 0].map((_, i) => {
+        const dayData = weeklyActivity.find(w => w.day === i + 1);
+        return dayData ? dayData.count : 0;
+      })
+    });
+  } catch (error) {
+    console.error('Get child progress error:', error);
+    res.status(500).json({ error: 'Failed to fetch progress' });
+  }
+});
+
+// Get parent's lessons (all children's lessons)
+router.get('/parent/lessons', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { status, child_id } = req.query;
+
+    let sql = `
+      SELECT lb.*, l.name as language_name,
+             CONCAT(educator.first_name, ' ', educator.last_name) as educator_name,
+             educator.avatar_url as educator_avatar,
+             CONCAT(student.first_name, ' ', student.last_name) as child_name
+      FROM lesson_bookings lb
+      JOIN languages l ON lb.language_id = l.id
+      LEFT JOIN users educator ON lb.educator_id = educator.id
+      JOIN users student ON lb.student_id = student.id
+      JOIN parent_child_links pcl ON student.id = pcl.child_id
+      WHERE pcl.parent_id = ?
+    `;
+    const params = [req.user.id];
+
+    if (status && status !== 'all') {
+      sql += ' AND lb.status = ?';
+      params.push(status);
+    }
+
+    if (child_id) {
+      sql += ' AND lb.student_id = ?';
+      params.push(child_id);
+    }
+
+    sql += ' ORDER BY lb.scheduled_date DESC, lb.scheduled_time DESC LIMIT 50';
+
+    const lessons = await query(sql, params);
+
+    res.json({ lessons });
+  } catch (error) {
+    console.error('Parent lessons error:', error);
+    res.status(500).json({ error: 'Failed to fetch lessons' });
+  }
+});
+
+// Update parent profile
+router.put('/parent/profile', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { firstName, lastName, phone, timezone } = req.body;
+
+    await query(`
+      UPDATE users SET first_name = ?, last_name = ?, phone = ?, timezone = ?
+      WHERE id = ?
+    `, [firstName, lastName, phone || null, timezone || 'America/New_York', req.user.id]);
+
+    res.json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// Update notification preferences
+router.put('/parent/notifications', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const preferences = JSON.stringify(req.body);
+
+    await query(`
+      UPDATE users SET notification_preferences = ? WHERE id = ?
+    `, [preferences, req.user.id]);
+
+    res.json({ message: 'Notification preferences updated' });
+  } catch (error) {
+    console.error('Update notifications error:', error);
+    res.status(500).json({ error: 'Failed to update preferences' });
+  }
+});
+
+// Change password
+router.put('/parent/password', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const bcrypt = require('bcryptjs');
+
+    // Verify current password
+    const users = await query('SELECT password_hash FROM users WHERE id = ?', [req.user.id]);
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const valid = await bcrypt.compare(currentPassword, users[0].password_hash);
+    if (!valid) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    // Update password
+    const hash = await bcrypt.hash(newPassword, 10);
+    await query('UPDATE users SET password_hash = ? WHERE id = ?', [hash, req.user.id]);
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+// Get billing information
+router.get('/parent/billing', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    // Get subscription info
+    const subscriptions = await query(`
+      SELECT * FROM subscriptions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1
+    `, [req.user.id]);
+
+    // Get invoices
+    const invoices = await query(`
+      SELECT * FROM invoices WHERE user_id = ? ORDER BY created_at DESC LIMIT 10
+    `, [req.user.id]);
+
+    // Get lesson credits
+    const credits = await query(`
+      SELECT SUM(credits) as total FROM lesson_credits WHERE user_id = ? AND expires_at > NOW()
+    `, [req.user.id]);
+
+    const subscription = subscriptions[0];
+
+    res.json({
+      currentPlan: subscription ? {
+        name: subscription.plan_name || 'Free Plan',
+        price: subscription.price || 0,
+        lessonsPerMonth: subscription.lessons_per_month || 0,
+        lessonsUsed: subscription.lessons_used || 0
+      } : {
+        name: 'Free Trial',
+        price: 0,
+        lessonsPerMonth: 3,
+        lessonsUsed: 0
+      },
+      balance: 0,
+      nextBillingDate: subscription?.next_billing_date || null,
+      paymentMethod: subscription?.payment_method ? JSON.parse(subscription.payment_method) : null,
+      invoices: invoices,
+      lessonCredits: credits[0]?.total || 0
+    });
+  } catch (error) {
+    console.error('Billing fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch billing information' });
+  }
+});
+
 // =============================================
 // LESSON BOOKING
 // =============================================
