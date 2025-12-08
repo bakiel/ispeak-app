@@ -124,10 +124,17 @@ router.get('/pricing-plans', async (req, res) => {
     sql += ' ORDER BY display_order ASC, price ASC';
 
     const plans = await query(sql);
-    res.json(plans.map(p => ({
-      ...p,
-      features: p.features ? JSON.parse(p.features) : []
-    })));
+    res.json(plans.map(p => {
+      let features = [];
+      if (p.features) {
+        try {
+          features = typeof p.features === 'string' ? JSON.parse(p.features) : p.features;
+        } catch (e) {
+          features = [];
+        }
+      }
+      return { ...p, features };
+    }));
   } catch (error) {
     console.error('Pricing plans fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch pricing plans' });
@@ -533,23 +540,34 @@ router.delete('/team/:id', authenticate, adminOnly, async (req, res) => {
 // =============================================
 
 // Get content blocks for a page (public)
-router.get('/blocks/:pageSlug', async (req, res) => {
+router.get('/blocks/:page', async (req, res) => {
   try {
-    const { active_only = 'true' } = req.query;
+    const { section, active_only = 'true' } = req.query;
 
-    let sql = 'SELECT * FROM content_blocks WHERE page_slug = ?';
-    const params = [req.params.pageSlug];
+    let sql = 'SELECT * FROM content_blocks WHERE page = ?';
+    const params = [req.params.page];
+
+    if (section) {
+      sql += ' AND section = ?';
+      params.push(section);
+    }
 
     if (active_only === 'true') {
       sql += ' AND is_active = TRUE';
     }
-    sql += ' ORDER BY display_order ASC';
 
     const blocks = await query(sql, params);
-    res.json(blocks.map(b => ({
-      ...b,
-      metadata: b.metadata ? JSON.parse(b.metadata) : null
-    })));
+    res.json(blocks.map(b => {
+      let metadata = null;
+      if (b.metadata) {
+        try {
+          metadata = typeof b.metadata === 'string' ? JSON.parse(b.metadata) : b.metadata;
+        } catch (e) {
+          metadata = null;
+        }
+      }
+      return { ...b, metadata };
+    }));
   } catch (error) {
     console.error('Content blocks fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch content blocks' });
@@ -557,11 +575,11 @@ router.get('/blocks/:pageSlug', async (req, res) => {
 });
 
 // Get single content block
-router.get('/blocks/:pageSlug/:blockKey', async (req, res) => {
+router.get('/blocks/:page/:section/:blockKey', async (req, res) => {
   try {
     const blocks = await query(
-      'SELECT * FROM content_blocks WHERE page_slug = ? AND block_key = ?',
-      [req.params.pageSlug, req.params.blockKey]
+      'SELECT * FROM content_blocks WHERE page = ? AND section = ? AND block_key = ?',
+      [req.params.page, req.params.section, req.params.blockKey]
     );
 
     if (blocks.length === 0) {
@@ -569,10 +587,15 @@ router.get('/blocks/:pageSlug/:blockKey', async (req, res) => {
     }
 
     const block = blocks[0];
-    res.json({
-      ...block,
-      metadata: block.metadata ? JSON.parse(block.metadata) : null
-    });
+    let metadata = null;
+    if (block.metadata) {
+      try {
+        metadata = typeof block.metadata === 'string' ? JSON.parse(block.metadata) : block.metadata;
+      } catch (e) {
+        metadata = null;
+      }
+    }
+    res.json({ ...block, metadata });
   } catch (error) {
     console.error('Content block fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch content block' });
@@ -581,7 +604,8 @@ router.get('/blocks/:pageSlug/:blockKey', async (req, res) => {
 
 // Create or update content block (admin only)
 router.post('/blocks', authenticate, adminOnly, [
-  body('page_slug').trim().notEmpty(),
+  body('page').trim().notEmpty(),
+  body('section').trim().notEmpty(),
   body('block_key').trim().notEmpty()
 ], async (req, res) => {
   try {
@@ -590,33 +614,22 @@ router.post('/blocks', authenticate, adminOnly, [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const {
-      page_slug, block_key, title, subtitle, content,
-      image_url, video_url, button_text, button_url,
-      metadata, display_order, is_active
-    } = req.body;
+    const { page, section, block_key, content_type, content, metadata, is_active } = req.body;
 
     // Upsert - insert or update on duplicate key
     const result = await query(`
       INSERT INTO content_blocks
-      (page_slug, block_key, title, subtitle, content, image_url, video_url, button_text, button_url, metadata, display_order, is_active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (page, section, block_key, content_type, content, metadata, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE
-        title = VALUES(title),
-        subtitle = VALUES(subtitle),
+        content_type = VALUES(content_type),
         content = VALUES(content),
-        image_url = VALUES(image_url),
-        video_url = VALUES(video_url),
-        button_text = VALUES(button_text),
-        button_url = VALUES(button_url),
         metadata = VALUES(metadata),
-        display_order = VALUES(display_order),
         is_active = VALUES(is_active)
     `, [
-      page_slug, block_key, title, subtitle, content,
-      image_url, video_url, button_text, button_url,
+      page, section, block_key, content_type || 'text', content,
       metadata ? JSON.stringify(metadata) : null,
-      display_order || 0, is_active !== false
+      is_active !== false
     ]);
 
     res.status(201).json({
@@ -630,11 +643,11 @@ router.post('/blocks', authenticate, adminOnly, [
 });
 
 // Delete content block (admin only)
-router.delete('/blocks/:pageSlug/:blockKey', authenticate, adminOnly, async (req, res) => {
+router.delete('/blocks/:page/:section/:blockKey', authenticate, adminOnly, async (req, res) => {
   try {
     await query(
-      'DELETE FROM content_blocks WHERE page_slug = ? AND block_key = ?',
-      [req.params.pageSlug, req.params.blockKey]
+      'DELETE FROM content_blocks WHERE page = ? AND section = ? AND block_key = ?',
+      [req.params.page, req.params.section, req.params.blockKey]
     );
     res.json({ message: 'Content block deleted' });
   } catch (error) {
@@ -647,10 +660,10 @@ router.delete('/blocks/:pageSlug/:blockKey', authenticate, adminOnly, async (req
 router.get('/pages', authenticate, adminOnly, async (req, res) => {
   try {
     const pages = await query(`
-      SELECT page_slug, COUNT(*) as block_count, MAX(updated_at) as last_updated
+      SELECT page, COUNT(*) as block_count, MAX(updated_at) as last_updated
       FROM content_blocks
-      GROUP BY page_slug
-      ORDER BY page_slug
+      GROUP BY page
+      ORDER BY page
     `);
     res.json(pages);
   } catch (error) {
