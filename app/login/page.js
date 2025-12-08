@@ -6,7 +6,7 @@ import ModernNavigation from '@/components/ModernNavigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.srv1145603.hstgr.cloud'
 
 export default function LoginPage() {
   const router = useRouter()

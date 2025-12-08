@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 // Use local API proxy for browser requests, direct URL for image display
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.srv1145603.hstgr.cloud'
 
 export default function MediaPicker({ isOpen, onClose, onSelect, multiple = false }) {
   const [media, setMedia] = useState([])

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 const getApiBase = () => {
-  const base = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+  const base = process.env.NEXT_PUBLIC_API_URL || 'https://api.srv1145603.hstgr.cloud'
   return base.replace(/\/api\/?$/, '')
 }
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import Link from 'next/link'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.srv1145603.hstgr.cloud'
 
 export default function FAQPage() {
   const [faqs, setFaqs] = useState([])

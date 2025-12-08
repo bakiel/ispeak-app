@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import PortalLayout from '@/components/portal/PortalLayout'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://72.61.201.237:3001'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.srv1145603.hstgr.cloud'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const TIME_SLOTS = [

@@ -10,7 +10,7 @@ const nextConfig = {
     return [
       {
         source: '/uploads/:path*',
-        destination: 'http://72.61.201.237:3001/uploads/:path*'
+        destination: 'https://api.srv1145603.hstgr.cloud/uploads/:path*'
       }
     ]
   }
