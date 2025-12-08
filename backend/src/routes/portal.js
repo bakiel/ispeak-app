@@ -214,6 +214,276 @@ router.post('/student/enroll', authenticate, [
   }
 });
 
+// Get all student progress (no language filter)
+router.get('/student/progress', authenticate, async (req, res) => {
+  try {
+    const progress = await query(`
+      SELECT sp.*, l.name as language_name, l.native_name, l.slug as language_slug
+      FROM student_progress sp
+      JOIN languages l ON sp.language_id = l.id
+      WHERE sp.user_id = ?
+    `, [req.user.id]);
+
+    // Calculate overall stats
+    const stats = {
+      totalLessonsCompleted: progress.reduce((sum, p) => sum + (p.total_lessons_completed || 0), 0),
+      totalPracticeMinutes: progress.reduce((sum, p) => sum + (p.total_practice_minutes || 0), 0),
+      vocabularyLearned: progress.reduce((sum, p) => sum + (p.vocabulary_learned || 0), 0),
+      currentStreak: Math.max(...progress.map(p => p.current_streak_days || 0), 0),
+      languagesEnrolled: progress.length
+    };
+
+    res.json({ progress, stats });
+  } catch (error) {
+    console.error('Student progress error:', error);
+    res.status(500).json({ error: 'Failed to fetch progress' });
+  }
+});
+
+// Get student achievements
+router.get('/student/achievements', authenticate, async (req, res) => {
+  try {
+    const achievements = await query(`
+      SELECT a.*, ua.earned_at
+      FROM user_achievements ua
+      JOIN achievements a ON ua.achievement_id = a.id
+      WHERE ua.user_id = ?
+      ORDER BY ua.earned_at DESC
+    `, [req.user.id]);
+
+    // Get all available achievements for comparison
+    const allAchievements = await query('SELECT * FROM achievements ORDER BY category, name');
+
+    res.json({
+      earned: achievements,
+      available: allAchievements,
+      totalEarned: achievements.length,
+      totalAvailable: allAchievements.length
+    });
+  } catch (error) {
+    console.error('Achievements error:', error);
+    // Return empty if tables don't exist
+    res.json({ earned: [], available: [], totalEarned: 0, totalAvailable: 0 });
+  }
+});
+
+// Get available educators for booking
+router.get('/student/educators', authenticate, async (req, res) => {
+  try {
+    const { language_id } = req.query;
+
+    let sql = `
+      SELECT DISTINCT u.id, u.first_name, u.last_name, u.avatar_url, u.bio,
+             GROUP_CONCAT(DISTINCT l.name) as languages,
+             (SELECT AVG(rating) FROM lesson_reviews WHERE educator_id = u.id) as avg_rating,
+             (SELECT COUNT(*) FROM lesson_bookings WHERE educator_id = u.id AND status = 'completed') as total_lessons
+      FROM users u
+      LEFT JOIN educator_languages el ON u.id = el.educator_id
+      LEFT JOIN languages l ON el.language_id = l.id
+      WHERE u.role = 'educator'
+    `;
+    const params = [];
+
+    if (language_id) {
+      sql += ' AND el.language_id = ?';
+      params.push(language_id);
+    }
+
+    sql += ' GROUP BY u.id ORDER BY total_lessons DESC';
+
+    const educators = await query(sql, params);
+
+    res.json({ educators });
+  } catch (error) {
+    console.error('Educators fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch educators' });
+  }
+});
+
+// Get languages available
+router.get('/student/languages', authenticate, async (req, res) => {
+  try {
+    const languages = await query(`
+      SELECT l.*,
+             (SELECT COUNT(*) FROM users u JOIN educator_languages el ON u.id = el.educator_id WHERE el.language_id = l.id) as educator_count
+      FROM languages l
+      WHERE l.is_active = 1
+      ORDER BY l.name
+    `);
+
+    res.json({ languages });
+  } catch (error) {
+    console.error('Languages fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch languages' });
+  }
+});
+
+// Get educator schedule
+router.get('/educator/schedule', authenticate, requireRole('educator', 'admin'), async (req, res) => {
+  try {
+    const { start_date, end_date } = req.query;
+
+    let sql = `
+      SELECT lb.*, l.name as language_name,
+             CONCAT(u.first_name, ' ', u.last_name) as student_name,
+             u.avatar_url as student_avatar
+      FROM lesson_bookings lb
+      JOIN languages l ON lb.language_id = l.id
+      JOIN users u ON lb.student_id = u.id
+      WHERE lb.educator_id = ?
+    `;
+    const params = [req.user.id];
+
+    if (start_date) {
+      sql += ' AND lb.scheduled_date >= ?';
+      params.push(start_date);
+    }
+    if (end_date) {
+      sql += ' AND lb.scheduled_date <= ?';
+      params.push(end_date);
+    }
+
+    sql += ' ORDER BY lb.scheduled_date ASC, lb.scheduled_time ASC';
+
+    const lessons = await query(sql, params);
+
+    res.json({ lessons });
+  } catch (error) {
+    console.error('Educator schedule error:', error);
+    res.status(500).json({ error: 'Failed to fetch schedule' });
+  }
+});
+
+// Get educator availability settings
+router.get('/educator/availability', authenticate, requireRole('educator', 'admin'), async (req, res) => {
+  try {
+    const availability = await query(`
+      SELECT * FROM educator_availability
+      WHERE educator_id = ?
+      ORDER BY day_of_week, start_time
+    `, [req.user.id]);
+
+    res.json({ availability });
+  } catch (error) {
+    console.error('Educator availability error:', error);
+    res.json({ availability: [] });
+  }
+});
+
+// Set educator availability
+router.post('/educator/availability', authenticate, requireRole('educator', 'admin'), async (req, res) => {
+  try {
+    const { availability } = req.body;
+
+    // Clear existing availability
+    await query('DELETE FROM educator_availability WHERE educator_id = ?', [req.user.id]);
+
+    // Insert new availability
+    for (const slot of availability) {
+      await query(`
+        INSERT INTO educator_availability (educator_id, day_of_week, start_time, end_time, is_available)
+        VALUES (?, ?, ?, ?, ?)
+      `, [req.user.id, slot.day_of_week, slot.start_time, slot.end_time, slot.is_available !== false]);
+    }
+
+    res.json({ message: 'Availability updated successfully' });
+  } catch (error) {
+    console.error('Set availability error:', error);
+    res.status(500).json({ error: 'Failed to update availability' });
+  }
+});
+
+// Get educator reports/analytics
+router.get('/educator/reports', authenticate, requireRole('educator', 'admin'), async (req, res) => {
+  try {
+    const { period = 'month' } = req.query;
+
+    let dateFilter = 'MONTH(scheduled_date) = MONTH(CURDATE()) AND YEAR(scheduled_date) = YEAR(CURDATE())';
+    if (period === 'week') {
+      dateFilter = 'scheduled_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)';
+    } else if (period === 'year') {
+      dateFilter = 'YEAR(scheduled_date) = YEAR(CURDATE())';
+    }
+
+    // Get lesson stats
+    const lessonStats = await query(`
+      SELECT
+        COUNT(*) as total_lessons,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+        SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled,
+        SUM(CASE WHEN status = 'no-show' THEN 1 ELSE 0 END) as no_shows,
+        SUM(CASE WHEN status = 'completed' THEN duration_minutes ELSE 0 END) as total_minutes
+      FROM lesson_bookings
+      WHERE educator_id = ? AND ${dateFilter}
+    `, [req.user.id]);
+
+    // Get student count
+    const studentStats = await query(`
+      SELECT COUNT(DISTINCT student_id) as unique_students
+      FROM lesson_bookings
+      WHERE educator_id = ? AND ${dateFilter}
+    `, [req.user.id]);
+
+    // Get lessons by language
+    const byLanguage = await query(`
+      SELECT l.name as language, COUNT(*) as count
+      FROM lesson_bookings lb
+      JOIN languages l ON lb.language_id = l.id
+      WHERE lb.educator_id = ? AND lb.status = 'completed' AND ${dateFilter}
+      GROUP BY l.id
+    `, [req.user.id]);
+
+    // Get average rating
+    const ratings = await query(`
+      SELECT AVG(rating) as avg_rating, COUNT(*) as review_count
+      FROM lesson_reviews
+      WHERE educator_id = ?
+    `, [req.user.id]);
+
+    res.json({
+      period,
+      lessons: lessonStats[0] || {},
+      students: studentStats[0]?.unique_students || 0,
+      byLanguage,
+      rating: {
+        average: ratings[0]?.avg_rating || 0,
+        count: ratings[0]?.review_count || 0
+      }
+    });
+  } catch (error) {
+    console.error('Educator reports error:', error);
+    res.status(500).json({ error: 'Failed to fetch reports' });
+  }
+});
+
+// Update educator profile/settings
+router.put('/educator/settings', authenticate, requireRole('educator', 'admin'), async (req, res) => {
+  try {
+    const { firstName, lastName, bio, phone, timezone, languages } = req.body;
+
+    await query(`
+      UPDATE users SET first_name = ?, last_name = ?, bio = ?, phone = ?, timezone = ?
+      WHERE id = ?
+    `, [firstName, lastName, bio || null, phone || null, timezone || 'America/New_York', req.user.id]);
+
+    // Update languages if provided
+    if (languages && Array.isArray(languages)) {
+      await query('DELETE FROM educator_languages WHERE educator_id = ?', [req.user.id]);
+      for (const lang of languages) {
+        await query(`
+          INSERT INTO educator_languages (educator_id, language_id, proficiency, is_primary)
+          VALUES (?, ?, ?, ?)
+        `, [req.user.id, lang.language_id, lang.proficiency || 'fluent', lang.is_primary || false]);
+      }
+    }
+
+    res.json({ message: 'Settings updated successfully' });
+  } catch (error) {
+    console.error('Update settings error:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
 // =============================================
 // EDUCATOR/TEACHER PORTAL
 // =============================================
