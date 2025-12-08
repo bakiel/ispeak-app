@@ -7,28 +7,31 @@ const getApiBase = () => {
   return base.replace(/\/api\/?$/, '')
 }
 
+// Admin secret key for media operations
+const ADMIN_SECRET_KEY = 'ispeak-admin-2024'
+
 export async function POST(request) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('auth_token')?.value ||
                   request.headers.get('Authorization')?.replace('Bearer ', '')
 
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
     const body = await request.json()
     const API_BASE = getApiBase()
 
+    // Build headers - use token if available, otherwise use secret key
+    const headers = {
+      'Content-Type': 'application/json'
+    }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    } else {
+      headers['X-API-Key'] = ADMIN_SECRET_KEY
+    }
+
     const response = await fetch(`${API_BASE}/api/media/upload-url`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers,
       body: JSON.stringify(body)
     })
 

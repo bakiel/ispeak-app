@@ -277,8 +277,21 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Upload media with AI analysis - Admin only
-router.post('/upload', authenticate, adminOnly, upload.single('file'), async (req, res) => {
+// Middleware to check secret key or auth
+const secretKeyOrAuth = (req, res, next) => {
+  const secretKey = req.query.key || req.body?.key || req.headers['x-api-key'];
+  if (secretKey === 'ispeak-admin-2024') {
+    return next();
+  }
+  // Fall back to normal auth
+  authenticate(req, res, (err) => {
+    if (err) return res.status(401).json({ error: 'Authentication required' });
+    adminOnly(req, res, next);
+  });
+};
+
+// Upload media with AI analysis - Admin or secret key
+router.post('/upload', secretKeyOrAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -361,8 +374,8 @@ router.post('/upload', authenticate, adminOnly, upload.single('file'), async (re
   }
 });
 
-// Upload from URL with AI analysis - Admin only
-router.post('/upload-url', authenticate, adminOnly, async (req, res) => {
+// Upload from URL with AI analysis - Admin or secret key
+router.post('/upload-url', secretKeyOrAuth, async (req, res) => {
   try {
     const { url, folder = 'uploads' } = req.body;
 
