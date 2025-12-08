@@ -500,13 +500,13 @@ router.get('/booking/educators/:languageId', authenticate, async (req, res) => {
 
     const educators = await query(`
       SELECT u.id, u.first_name, u.last_name, u.avatar_url,
-             el.proficiency_level, el.is_native_speaker,
+             el.proficiency, el.is_primary,
              (SELECT AVG(rating) FROM lesson_reviews WHERE educator_id = u.id) as avg_rating,
              (SELECT COUNT(*) FROM lesson_bookings WHERE educator_id = u.id AND status = 'completed') as total_lessons
       FROM users u
       JOIN educator_languages el ON u.id = el.educator_id
       WHERE el.language_id = ? AND u.role = 'educator'
-      ORDER BY el.is_native_speaker DESC, total_lessons DESC
+      ORDER BY (el.proficiency = 'native') DESC, total_lessons DESC
     `, [languageId]);
 
     res.json(educators);
