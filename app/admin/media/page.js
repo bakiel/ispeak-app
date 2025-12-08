@@ -208,7 +208,11 @@ export default function MediaLibrary() {
   const getImageUrl = (item) => {
     // If it's already an absolute URL, use it
     if (item.url?.startsWith('http')) return item.url
-    // Use direct /uploads/ path - Next.js rewrites proxy to backend
+    // Use image proxy API to avoid mixed content (HTTPS frontend -> HTTP backend)
+    // Convert /uploads/filename.png to /api/media/image/uploads/filename.png
+    if (item.url?.startsWith('/uploads/')) {
+      return `/api/media/image${item.url}`
+    }
     return item.url
   }
 
