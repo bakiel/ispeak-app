@@ -285,6 +285,40 @@ router.delete('/:id', authenticate, adminOnly, async (req, res) => {
   }
 });
 
+// Direct insert for seeding (no auth required - for initial setup only)
+router.post('/direct-insert', async (req, res) => {
+  try {
+    const {
+      title, slug, excerpt, content, featured_image,
+      category_id, author_name, is_published
+    } = req.body;
+
+    // Check if slug already exists
+    const existing = await query('SELECT id FROM blog_posts WHERE slug = ?', [slug]);
+    if (existing.length > 0) {
+      return res.status(200).json({ message: 'Post already exists', postId: existing[0].id });
+    }
+
+    const result = await query(`
+      INSERT INTO blog_posts (
+        title, slug, excerpt, content, featured_image,
+        category_id, author_name, is_published, published_at, views
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), 0)
+    `, [
+      title, slug, excerpt, content, featured_image,
+      category_id || 1, author_name || 'iSPEAK Team', is_published ? 1 : 0
+    ]);
+
+    res.status(201).json({
+      message: 'Post created',
+      postId: result.insertId
+    });
+  } catch (error) {
+    console.error('Direct insert error:', error);
+    res.status(500).json({ error: 'Failed to create post', details: error.message });
+  }
+});
+
 // Create category
 router.post('/categories', authenticate, adminOnly, [
   body('name').trim().notEmpty(),
