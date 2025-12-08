@@ -703,6 +703,49 @@ app.post('/migrate-portals', async (req, res) => {
   }
 });
 
+// Seed test data endpoint
+app.post('/seed-test-data', async (req, res) => {
+  try {
+    const results = [];
+
+    // Update educator user role
+    await query("UPDATE users SET role = 'educator' WHERE email = 'educator@ispeak.test'");
+    results.push({ action: 'Update educator role', status: 'done' });
+
+    // Create parent user if not exists
+    try {
+      const bcrypt = require('bcryptjs');
+      const hash = await bcrypt.hash('TestPass123', 10);
+      await query(
+        "INSERT INTO users (email, password_hash, first_name, last_name, role) VALUES (?, ?, ?, ?, 'parent') ON DUPLICATE KEY UPDATE role = 'parent'",
+        ['parent@ispeak.test', hash, 'Test', 'Parent']
+      );
+      results.push({ action: 'Create parent user', status: 'done' });
+    } catch (err) {
+      results.push({ action: 'Create parent user', status: 'exists or error', error: err.message });
+    }
+
+    // Link educator to Yoruba language
+    try {
+      const educators = await query("SELECT id FROM users WHERE email = 'educator@ispeak.test'");
+      if (educators.length > 0) {
+        await query(
+          "INSERT INTO educator_languages (educator_id, language_id, proficiency, is_primary) VALUES (?, 1, 'native', true) ON DUPLICATE KEY UPDATE proficiency = 'native'",
+          [educators[0].id]
+        );
+        results.push({ action: 'Link educator to Yoruba', status: 'done' });
+      }
+    } catch (err) {
+      results.push({ action: 'Link educator to language', status: 'error', error: err.message });
+    }
+
+    res.json({ message: 'Test data seeded', results });
+  } catch (error) {
+    console.error('Seed error:', error);
+    res.status(500).json({ error: 'Seeding failed', details: error.message });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
