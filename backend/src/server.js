@@ -19,6 +19,7 @@ const contactRoutes = require('./routes/contact');
 const adminRoutes = require('./routes/admin');
 const mediaRoutes = require('./routes/media');
 const contentRoutes = require('./routes/content');
+const portalRoutes = require('./routes/portal');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -147,6 +148,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/portal', portalRoutes);
 
 // Database migration endpoint for media library table
 app.post('/migrate-media', async (req, res) => {
@@ -567,6 +569,136 @@ app.post('/migrate-platform', async (req, res) => {
     });
   } catch (error) {
     console.error('Platform migration error:', error);
+    res.status(500).json({ error: 'Migration failed', details: error.message });
+  }
+});
+
+// Portal tables migration
+app.post('/migrate-portals', async (req, res) => {
+  try {
+    const { query } = require('./config/database');
+    const results = [];
+
+    // Create lesson_bookings table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS lesson_bookings (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          student_id INT NOT NULL,
+          educator_id INT,
+          language_id INT NOT NULL,
+          scheduled_date DATE NOT NULL,
+          scheduled_time TIME NOT NULL,
+          duration_minutes INT DEFAULT 30,
+          status ENUM('pending', 'confirmed', 'cancelled', 'completed', 'no-show') DEFAULT 'pending',
+          student_notes TEXT,
+          educator_notes TEXT,
+          cancellation_reason TEXT,
+          meeting_link VARCHAR(500),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          INDEX idx_student (student_id),
+          INDEX idx_educator (educator_id),
+          INDEX idx_date (scheduled_date),
+          INDEX idx_status (status)
+        )
+      `);
+      results.push({ table: 'lesson_bookings', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'lesson_bookings', status: 'exists or error', error: err.message });
+    }
+
+    // Create parent_child_links table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS parent_child_links (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          parent_id INT NOT NULL,
+          child_id INT NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_link (parent_id, child_id),
+          INDEX idx_parent (parent_id),
+          INDEX idx_child (child_id)
+        )
+      `);
+      results.push({ table: 'parent_child_links', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'parent_child_links', status: 'exists or error', error: err.message });
+    }
+
+    // Create educator_availability table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS educator_availability (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          educator_id INT NOT NULL,
+          day_of_week INT NOT NULL,
+          start_time TIME NOT NULL,
+          end_time TIME NOT NULL,
+          is_available BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          INDEX idx_educator (educator_id)
+        )
+      `);
+      results.push({ table: 'educator_availability', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'educator_availability', status: 'exists or error', error: err.message });
+    }
+
+    // Create educator_languages table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS educator_languages (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          educator_id INT NOT NULL,
+          language_id INT NOT NULL,
+          proficiency ENUM('native', 'fluent', 'advanced') DEFAULT 'fluent',
+          is_primary BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_educator_language (educator_id, language_id)
+        )
+      `);
+      results.push({ table: 'educator_languages', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'educator_languages', status: 'exists or error', error: err.message });
+    }
+
+    // Create lesson_reviews table
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS lesson_reviews (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          booking_id INT NOT NULL,
+          student_id INT NOT NULL,
+          educator_id INT NOT NULL,
+          rating INT NOT NULL,
+          review_text TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_booking_review (booking_id)
+        )
+      `);
+      results.push({ table: 'lesson_reviews', status: 'created' });
+    } catch (err) {
+      results.push({ table: 'lesson_reviews', status: 'exists or error', error: err.message });
+    }
+
+    // Add role column to users if not exists
+    try {
+      await query(`
+        ALTER TABLE users
+        MODIFY COLUMN role ENUM('customer', 'student', 'parent', 'educator', 'admin') DEFAULT 'customer'
+      `);
+      results.push({ alter: 'users.role', status: 'updated' });
+    } catch (err) {
+      results.push({ alter: 'users.role', status: 'already updated or error', error: err.message });
+    }
+
+    res.json({
+      message: 'Portal tables migration completed',
+      results: results
+    });
+  } catch (error) {
+    console.error('Portal migration error:', error);
     res.status(500).json({ error: 'Migration failed', details: error.message });
   }
 });
