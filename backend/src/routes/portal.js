@@ -857,6 +857,151 @@ router.delete('/parent/children/:childId', authenticate, requireRole('parent', '
   }
 });
 
+// Get single child details
+router.get('/parent/children/:childId', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { childId } = req.params;
+
+    // Verify parent owns this child
+    const link = await query(
+      'SELECT id FROM parent_child_links WHERE parent_id = ? AND child_id = ?',
+      [req.user.id, childId]
+    );
+
+    if (link.length === 0) {
+      return res.status(403).json({ error: 'Not authorized to view this child' });
+    }
+
+    // Get child details
+    const children = await query(`
+      SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.created_at,
+             (SELECT l.name FROM languages l
+              JOIN student_progress sp ON l.id = sp.language_id
+              WHERE sp.user_id = u.id
+              ORDER BY sp.updated_at DESC LIMIT 1) as language_name,
+             (SELECT sp.current_level FROM student_progress sp WHERE sp.user_id = u.id ORDER BY sp.updated_at DESC LIMIT 1) as current_level
+      FROM users u
+      WHERE u.id = ?
+    `, [childId]);
+
+    if (children.length === 0) {
+      return res.status(404).json({ error: 'Child not found' });
+    }
+
+    const child = children[0];
+
+    // Get lesson stats
+    const lessonStats = await query(`
+      SELECT
+        COUNT(*) as total_lessons,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as lessons_completed,
+        SUM(CASE WHEN status = 'completed' THEN duration_minutes ELSE 0 END) as total_practice_minutes
+      FROM lesson_bookings
+      WHERE student_id = ?
+    `, [childId]);
+
+    const stats = lessonStats[0] || {};
+
+    // Get progress data
+    const progressData = await query(`
+      SELECT sp.*, l.name as language_name
+      FROM student_progress sp
+      JOIN languages l ON sp.language_id = l.id
+      WHERE sp.user_id = ?
+    `, [childId]);
+
+    const progress = progressData[0] || {};
+
+    res.json({
+      child: {
+        ...child,
+        lessons_completed: stats.lessons_completed || 0,
+        practice_hours: Math.round((stats.total_practice_minutes || 0) / 60),
+        vocabulary_learned: progress.vocabulary_count || 0,
+        progress: progress.lessons_completed ? Math.min(100, Math.round((progress.lessons_completed / 50) * 100)) : 0,
+        speaking_progress: progress.speaking_score || 0,
+        listening_progress: progress.listening_score || 0,
+        vocabulary_progress: progress.vocabulary_score || 0,
+        current_level: child.current_level || 'Beginner'
+      }
+    });
+  } catch (error) {
+    console.error('Get child details error:', error);
+    res.status(500).json({ error: 'Failed to fetch child details' });
+  }
+});
+
+// Get child's lessons
+router.get('/parent/children/:childId/lessons', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { childId } = req.params;
+
+    // Verify parent owns this child
+    const link = await query(
+      'SELECT id FROM parent_child_links WHERE parent_id = ? AND child_id = ?',
+      [req.user.id, childId]
+    );
+
+    if (link.length === 0) {
+      return res.status(403).json({ error: 'Not authorized to view this child' });
+    }
+
+    // Get lessons
+    const lessons = await query(`
+      SELECT lb.*, l.name as language_name,
+             CONCAT(u.first_name, ' ', u.last_name) as educator_name
+      FROM lesson_bookings lb
+      JOIN languages l ON lb.language_id = l.id
+      LEFT JOIN users u ON lb.educator_id = u.id
+      WHERE lb.student_id = ?
+      ORDER BY lb.scheduled_date DESC, lb.scheduled_time DESC
+      LIMIT 20
+    `, [childId]);
+
+    res.json({ lessons });
+  } catch (error) {
+    console.error('Get child lessons error:', error);
+    res.status(500).json({ error: 'Failed to fetch lessons' });
+  }
+});
+
+// Get child's achievements
+router.get('/parent/children/:childId/achievements', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { childId } = req.params;
+
+    // Verify parent owns this child
+    const link = await query(
+      'SELECT id FROM parent_child_links WHERE parent_id = ? AND child_id = ?',
+      [req.user.id, childId]
+    );
+
+    if (link.length === 0) {
+      return res.status(403).json({ error: 'Not authorized to view this child' });
+    }
+
+    // Get achievements
+    let achievements = [];
+    try {
+      achievements = await query(`
+        SELECT a.*, sa.earned_at
+        FROM student_achievements sa
+        JOIN achievements a ON sa.achievement_id = a.id
+        WHERE sa.user_id = ?
+        ORDER BY sa.earned_at DESC
+      `, [childId]);
+    } catch (e) {
+      // Table might not exist
+      achievements = [];
+    }
+
+    res.json({ achievements });
+  } catch (error) {
+    console.error('Get child achievements error:', error);
+    res.status(500).json({ error: 'Failed to fetch achievements' });
+  }
+});
+
 // Get child progress
 router.get('/parent/children/:childId/progress', authenticate, requireRole('parent', 'admin'), async (req, res) => {
   try {
@@ -1043,6 +1188,12 @@ router.get('/parent/billing', authenticate, requireRole('parent', 'admin'), asyn
     // Return default billing info (tables may not exist yet)
     // In production, you would query actual subscription tables
     res.json({
+      summary: {
+        currentPlan: 'Free Trial',
+        balance: 0,
+        nextBillingDate: null,
+        lessonCredits: 0
+      },
       currentPlan: {
         name: 'Free Trial',
         price: 0,
@@ -1058,6 +1209,46 @@ router.get('/parent/billing', authenticate, requireRole('parent', 'admin'), asyn
   } catch (error) {
     console.error('Billing fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch billing information' });
+  }
+});
+
+// Parent Settings
+router.get('/parent/settings', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const user = await query('SELECT id, email, first_name, last_name, phone, avatar_url FROM users WHERE id = ?', [req.user.id]);
+
+    res.json({
+      profile: user[0] || {},
+      notifications: {
+        email: true,
+        sms: false,
+        lessonReminders: true,
+        progressReports: true
+      },
+      preferences: {
+        language: 'en',
+        timezone: 'Africa/Johannesburg'
+      }
+    });
+  } catch (error) {
+    console.error('Settings fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
+router.put('/parent/settings', authenticate, requireRole('parent', 'admin'), async (req, res) => {
+  try {
+    const { firstName, lastName, phone } = req.body;
+
+    await query(
+      'UPDATE users SET first_name = ?, last_name = ?, phone = ? WHERE id = ?',
+      [firstName, lastName, phone, req.user.id]
+    );
+
+    res.json({ message: 'Settings updated successfully' });
+  } catch (error) {
+    console.error('Settings update error:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
   }
 });
 
