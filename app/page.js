@@ -25,7 +25,7 @@ export default function Home() {
             <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-xl">
               <iframe
                 className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/v1PUzEl4j80"
+                src="https://www.youtube.com/embed/v1PUzEl4j80?rel=0&modestbranding=1"
                 title="Meet Paji - iSPEAK Language Learning"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
