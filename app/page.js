@@ -22,17 +22,36 @@ export default function Home() {
             Paji is the friendly guide who will accompany your child throughout their language learning journey
           </p>
           <div className="w-full max-w-6xl mx-auto">
-            <div className="relative w-full aspect-video bg-gray-200 rounded-lg overflow-hidden">
-              <iframe 
-                width="100%" 
-                height="100%" 
-                src="https://www.youtube.com/embed/z10PGLGL8lY" 
-                frameBorder="0" 
-                allowFullScreen
-                className="absolute inset-0"
-              ></iframe>
-              {/* Badge to cover watermark in bottom right */}
-              <div className="absolute bottom-2 right-2 bg-yellow-400 text-gray-900 px-4 py-2 rounded-full shadow-lg font-bold">
+            <div className="relative w-full aspect-video bg-gradient-to-br from-yellow-400 via-orange-400 to-red-500 rounded-lg overflow-hidden shadow-xl">
+              {/* Decorative background pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-4 left-4 w-20 h-20 border-4 border-white rounded-full"></div>
+                <div className="absolute bottom-8 right-8 w-32 h-32 border-4 border-white rounded-full"></div>
+                <div className="absolute top-1/4 right-1/4 w-16 h-16 border-4 border-white rounded-full"></div>
+              </div>
+
+              {/* Content */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-8">
+                <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center mb-6 shadow-lg">
+                  <span className="text-5xl md:text-6xl">🦁</span>
+                </div>
+                <h3 className="text-2xl md:text-4xl font-bold mb-3">Hello! I&apos;m Paji!</h3>
+                <p className="text-lg md:text-xl mb-6 max-w-2xl opacity-90">
+                  Ready to explore African languages together? Let&apos;s start your adventure!
+                </p>
+                <a
+                  href="/plans"
+                  className="inline-flex items-center px-6 py-3 bg-white text-orange-600 rounded-full font-bold text-lg hover:bg-yellow-100 transition-colors shadow-lg"
+                >
+                  <span>Start Free Trial</span>
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </a>
+              </div>
+
+              {/* Paji Badge */}
+              <div className="absolute bottom-4 right-4 bg-yellow-400 text-gray-900 px-4 py-2 rounded-full shadow-lg font-bold">
                 <span>Paji</span>
               </div>
             </div>
